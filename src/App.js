@@ -8,7 +8,7 @@ function App() {
   const navigate = useNavigate();
 
   const navigateToEmployee = () => {
-    // 👇️ navigate to /contacts
+    // navigate to /contacts
     navigate('/Employee');
   };
 
@@ -18,12 +18,11 @@ function App() {
       <div>
         <button>Manager</button>
         <button onClick={navigateToEmployee}>Employee</button>
-
-        <Routes>
-          <Route path='/Employee' element={<Employee/>} />
-        </Routes>
-
       </div>
+
+      <Routes>
+          <Route path='/Employee' element={<Employee/>} />
+      </Routes>
     
     </>
   );
