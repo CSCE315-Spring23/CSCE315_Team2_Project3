@@ -2,6 +2,7 @@ import React from 'react'
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import Employee from './Employee';
 import Manager from './Manager';
+import CreateOrder from './CreateOrder';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
       <Routes>
           <Route path='/Employee' element={<Employee/>} />
           <Route path='/Manager' element={<Manager/>} />
+          <Route path='/Employee/CreateOrder' element={<CreateOrder/>} />
       </Routes>
     
     </>

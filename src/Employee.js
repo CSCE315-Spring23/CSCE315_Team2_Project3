@@ -1,6 +1,5 @@
 import React from 'react'
-import {Routes, Route, useNavigate} from 'react-router-dom';
-import CreateOrder from './CreateOrder';
+import {useNavigate} from 'react-router-dom';
 
 export default function Employee() {
 
@@ -8,17 +7,13 @@ export default function Employee() {
 
   const navigateToCreateOrder = () => {
     // navigate to /contacts
-    navigate('/CreateOrder');
+    navigate('/Employee/CreateOrder');
   };
   return (
     <>
         <div>
           <button onClick={navigateToCreateOrder}>Create Order</button>
         </div>
-
-        <Routes>
-          <Route path='/CreateOrder' element={<CreateOrder/>} />
-        </Routes>
     </>
   )
 }
