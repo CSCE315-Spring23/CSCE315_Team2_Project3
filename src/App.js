@@ -23,10 +23,6 @@ function App() {
       <div>
         <button onClick={navigateToManager}>Manager</button>
         <button onClick={navigateToEmployee}>Employee</button>
-
-        <Routes>
-          <Route path='/Manager' element={<Manager/>} />
-        </Routes>
       </div>
 
       <Routes>
