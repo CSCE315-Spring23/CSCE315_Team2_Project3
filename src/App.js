@@ -1,6 +1,7 @@
 import React from 'react'
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import Employee from './Employee';
+import Manager from './Manager';
 
 
 function App() {
@@ -11,17 +12,26 @@ function App() {
     // navigate to /contacts
     navigate('/Employee');
   };
+  const navigateToManager = () => {
+    // 👇️ navigate to /contacts
+    navigate('/Manager');
+  };
 
   return (
     <>
 
       <div>
-        <button>Manager</button>
+        <button onClick={navigateToManager}>Manager</button>
         <button onClick={navigateToEmployee}>Employee</button>
+
+        <Routes>
+          <Route path='/Manager' element={<Manager/>} />
+        </Routes>
       </div>
 
       <Routes>
           <Route path='/Employee' element={<Employee/>} />
+          <Route path='/Manager' element={<Manager/>} />
       </Routes>
     
     </>

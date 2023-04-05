@@ -4,7 +4,8 @@ export default function Employee() {
   return (
     <>
         <div>
-            Hello
+            This is the Employee side
+            {/* element={<Employee/>} */}
         </div>
     </>
   )
