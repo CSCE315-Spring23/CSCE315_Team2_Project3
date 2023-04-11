@@ -14,11 +14,24 @@ export default function Home() {
     navigate('/Manager');
   };
 
+  const navigateToCustomer = () => {
+    // 👇️ navigate to /contacts
+    navigate('/Customer');
+  };
+
+  const navigateToMenuBoard = () => {
+
+    navigate('/MenuBoard');
+
+  }
+
   return (
     <>
       <div>
         <button onClick={navigateToManager}>Manager</button>
         <button onClick={navigateToEmployee}>Employee</button>
+        <button onClick={navigateToCustomer}>Customer</button>
+        <button onClick={navigateToMenuBoard}>Menu</button>
       </div>
     
     </>

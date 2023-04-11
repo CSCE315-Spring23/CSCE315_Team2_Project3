@@ -8,6 +8,9 @@ import Home from './Home';
 import UpdatePrice from './UpdatePrice';
 import Restock from './Restock';
 import Reports from './Reports';
+import Customer from './Customer';
+import CreateOrderCustomer from './CreateOrderCustomer';
+import MenuBoard from './MenuBoard';
 
 
 function App() {
@@ -24,6 +27,9 @@ function App() {
           <Route path='/Manager/UpdatePrice' element={<UpdatePrice/>} />
           <Route path='/Manager/Restock' element={<Restock/>} />
           <Route path='/Manager/Reports' element={<Reports/>} />
+          <Route path='/Customer' element={<Customer/>} />
+          <Route path='/Customer/CreateOrder' element={<CreateOrderCustomer/>} />
+          <Route path='/MenuBoard' element={<MenuBoard/>} />
       </Routes>
     
     </>
