@@ -1,5 +1,6 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
+import Menu from './Menu';
 
 export default function MenuBoard() {
 
@@ -12,7 +13,7 @@ export default function MenuBoard() {
 
   return (
     <>
-        <div>Menu Board Here</div>
+        <Menu></Menu>
         <button onClick={navigateHome}>Exit</button>
     </>
   )
