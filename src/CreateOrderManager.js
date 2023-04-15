@@ -1,5 +1,6 @@
 import React from 'react'
 import {useNavigate} from 'react-router-dom';
+import TabbedStuff from './CreateOrderEmployee';
 
 export default function CreateOrder() {
 
@@ -9,8 +10,9 @@ export default function CreateOrder() {
     navigate('/Manager');
   };
 
-
+  
   return (
+    TabbedStuff,
     <>
         <div>
             Create Order Page
