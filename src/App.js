@@ -2,6 +2,7 @@ import React from 'react'
 import {Routes, Route} from 'react-router-dom';
 import Employee from './Employee';
 import Manager from './Manager';
+import Customize from './Customize';
 import CreateOrderEmployee from './CreateOrderEmployee';
 import CreateOrderManager from './CreateOrderManager';
 import Home from './Home';
@@ -34,6 +35,7 @@ function App() {
           <Route path='/Manager/Reports' element={<Reports/>} />
           <Route path='/Customer' element={<Customer/>} />
           <Route path='/Customer/CreateOrder' element={<CreateOrderCustomer/>} />
+          <Route path='/Customize' element={<Customize/>} />
           <Route path='/MenuBoard' element={<MenuBoard/>} />
           <Route path='/MenuBoard/GetFit' element={<GetFit/>} />
           <Route path='/MenuBoard/BeWell' element={<BeWell/>} />
