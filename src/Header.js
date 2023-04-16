@@ -1,5 +1,5 @@
 import React from 'react'
-import './Header.css';
+import './styles/Header.css';
 var title = "title"
 
 export default function Header(props) {

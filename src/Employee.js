@@ -6,7 +6,7 @@ export default function Employee() {
   const navigate = useNavigate();
 
   const navigateToCreateOrder = () => {
-    navigate('/Employee/CreateOrder');
+    navigate('/CreateOrder');
   };
 
   const navigateHome = () => {

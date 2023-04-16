@@ -7,7 +7,7 @@ export default function Customer() {
 
   const navigateToCreateOrder = () => {
 
-    navigate('/Customer/CreateOrder');
+    navigate('/CreateOrder');
 
   }
 

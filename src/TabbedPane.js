@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react';
-import './TabbedPane.css';
+import './styles/TabbedPane.css';
 
 var titles = [];
 var contents = [[]];
