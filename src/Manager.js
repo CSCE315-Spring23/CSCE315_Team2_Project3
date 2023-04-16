@@ -14,7 +14,7 @@ export default function Manager() {
   };
 
   const navigateToCreateOrder = () => {
-    navigate('/Manager/CreateOrder');
+    navigate('/CreateOrder');
   };
 
   const navigateToReports = () => {

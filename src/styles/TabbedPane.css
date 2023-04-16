@@ -1,0 +1,72 @@
+.tabbed-pane .tab-nav {
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .tabbed-pane .tab-nav li {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .tabbed-pane .tab-nav button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: #333;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-bottom: none;
+  }
+  
+  .tabbed-pane .tab-nav button:hover {
+    background-color: #f8f8f8;
+  }
+  .tabbed-pane .tab-nav button.active {
+    background-color: grey;
+    color:white;
+  }
+  
+  .tabbed-pane .tab-content .tab-panel {
+    display: none;
+  }
+  
+  .tabbed-pane .tab-content .tab-panel.active {
+    display: block;
+  }
+
+  .tab-panel {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
+  }
+  
+  .tab-panel button {
+    width: auto;
+    height: auto;
+    margin: 0.1%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-sizing: border-box;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  .tab-panel button:hover {
+    background-color: #ddd;
+  }
+  
+  .tab-panel button:active,
+  .tab-panel button.active {
+    background-color: maroon;
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    outline: none;
+  }

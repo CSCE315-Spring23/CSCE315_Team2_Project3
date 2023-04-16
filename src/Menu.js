@@ -1,5 +1,5 @@
 import React from 'react';
-import MenuNavbar from './MenuNavbar';
+//import MenuNavbar from './MenuNavbar';
 // import GetFit from './GetFit';
 // import BeWell from './BeWell';
 // import KidsMenu from './KidsMenu';
@@ -22,22 +22,9 @@ export default function Menu() {
             break
     }
 
-
   return (
     <>
         <h1>Menu</h1>
-        
-        <div id="menu-wrapper">
-
-            <button onClick={displayFeelEnergized}>FeelEnergized</button>
-            <button onClick={displayGetFit}>Get Fit</button>
-            <button onClick={displayManageWeight}>Manage Weight</button>
-            <button onClick={displayBeWell}>Be Well</button>
-            <button onClick={displayEnjoyTreat}>Enjoy a Treat</button>
-            <button onClick={displayKidsMenu}>Kids Menu</button>
-            {component}
-
-        </div>
     </>
   )
 }
