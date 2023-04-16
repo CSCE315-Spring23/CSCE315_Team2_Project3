@@ -4,30 +4,32 @@ import './styles/TabbedPane.css';
 
 var titles = [];
 var contents = [[]];
-var multipleSelections = new Boolean(false);
-const selectedButtonText = [];
 
 export default function TabbedPane(props) {
   //get passed in vars
-  multipleSelections = props.multipleSelections;
+  const multipleSelections = props.multipleSelections;
   titles = props.tabTitles;
   contents = props.tabContent;
 
   const [activeTab, setActiveTab] = useState(0);
+  const [activeButtons, setActiveButtons] = useState(new Array(props.tabContent.length).fill(null).map(() => new Array(props.tabContent[0].length).fill(false)));
   const [selectedButtonText, setSelectedButtonText] = useState([]);
+  props.onSelectedTabChange(titles[activeTab]);
 
   const handleTabClick = (index) => {
     setActiveTab(index);
+    props.onSelectedTabChange(titles[index]);
   };
 
   const getMatchingButtonIndex = (contents, buttonText) => {
     return contents.findIndex((item) => item === buttonText);
   };
 
-  const handleButtonClick = (text) => {
-    const buttonIndex = getMatchingButtonIndex(contents[activeTab], text);
-    const buttonElements = document.querySelectorAll(".tab-panel.active button");
-    buttonElements[buttonIndex].classList.remove("active");
+  const handleButtonClick = (text, tabIndex, buttonIndex) => {
+    const newActiveButtons = activeButtons.map((tabButtons, i) =>
+      i === tabIndex ? tabButtons.map((_, j) => j === buttonIndex) : tabButtons
+    );
+    setActiveButtons(newActiveButtons);
 
     if (selectedButtonText.includes(text)) {
       // Deselect the button
@@ -72,7 +74,7 @@ export default function TabbedPane(props) {
                 <button
                   key={itemIndex}
                   className={selectedButtonText.includes(item) ? 'active' : ''}
-                  onClick={() => handleButtonClick(item)}
+                  onClick={() => handleButtonClick(item, index, itemIndex)}
                 >
                   {item}
                 </button>
@@ -82,6 +84,7 @@ export default function TabbedPane(props) {
         ))}
       </div>
     </div>
+    {/*
     <div className="selected-button">
         {selectedButtonText.length > 0 && (
           <p>
@@ -89,6 +92,7 @@ export default function TabbedPane(props) {
           </p>
         )}
     </div>
+    */}
     </>
   )
 }

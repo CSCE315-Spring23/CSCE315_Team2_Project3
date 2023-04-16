@@ -1,3 +1,5 @@
+//Treating this as temp database for reading
+
 //example array of titles
 export const titles = ["feel_energized", "get_fit", "manage_weight", "be_well", "enjoy_a_treat", "kids", "seasonal"];
 
@@ -20,3 +22,10 @@ export const contents_ing = [
   ["whey", "peanut_butter"],
   ["mint"]
 ]
+
+export const sizeTit = ["size"];
+export const sizeCont = [["40","32","20","16"]]
+
+export const orderID = "69420";
+export const employee = "Biggie Cheese"
+export const smoothieName = "coffee_dlite_mocha";

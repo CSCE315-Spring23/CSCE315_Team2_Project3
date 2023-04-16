@@ -9,6 +9,7 @@ import UpdatePrice from './UpdatePrice';
 import Restock from './Restock';
 import Reports from './Reports';
 import Customer from './Customer';
+import Checkout from './Checkout';
 import MenuBoard from './MenuBoard';
 import GetFit from './GetFit';
 import BeWell from './BeWell';
@@ -31,6 +32,7 @@ function App() {
           <Route path='/Manager/Reports' element={<Reports/>} />
           <Route path='/Customer' element={<Customer/>} />
           <Route path='/CreateOrder' element={<CreateOrder/>} />
+          <Route path='/Checkout' element={<Checkout/>} />
           <Route path='/Customize' element={<Customize/>} />
           <Route path='/MenuBoard' element={<MenuBoard/>} />
           <Route path='/MenuBoard/GetFit' element={<GetFit/>} />

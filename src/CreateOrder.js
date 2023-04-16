@@ -2,40 +2,80 @@ import React from 'react';
 import {useNavigate} from 'react-router-dom';
 import { useState } from 'react';
 import Header from './Header';
+import QuantityCounter from './QuantityCounter';
 //import arrays from another file
-import { titles, contents } from './temp_helper.js';
+import { titles, contents, sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
 
 export default function CreateOrder() {
   const navigate = useNavigate();
-  const [selectedButton, setSelectedButton] = useState('');
-  
+  const [smoothieSelect, setSmoothie] = useState('');
+  const [sizeSelect, setSize] = useState('');
+  const [quantity, setQuantity] = useState('');
+
   const navigateToCustomize = () => {
     navigate('/Customize');
   };
+  const navigateToCheckout = () => {
+    navigate('/Checkout');
+  };
+  
+  const addToOrder = () => {
+  };
 
-  const getChange = (newSelectedButton) => {
-    setSelectedButton(newSelectedButton);
+  const [selectedTab, setSelectedTab] = useState('');
+  const getTab = (newSelectedButton) => {
+    setSelectedTab(newSelectedButton);
+  };
+  const newSmoothie = (newSelectedButton) => {
+    setSmoothie(newSelectedButton);
+  };
+  const newSize = (newSelectedButton) => {
+    setSize(newSelectedButton);
+  };
+  const newQuantity = (newSelectedButton) => {
+    setQuantity(newSelectedButton);
   };
 
   return (
-    //call TabbedPane in embedded html
     <>
       <Header pageTitle="Create Order"/>
 
       <TabbedPane tabTitles={titles} 
         tabContent={contents} 
         multipleSelections={false} 
-        onSelectedButtonChange={getChange}/>
+        onSelectedButtonChange={newSmoothie}
+        onSelectedTabChange={getTab}
+        />
+
+      <TabbedPane tabTitles={sizeTit} 
+        tabContent={sizeCont} 
+        multipleSelections={true} 
+        onSelectedButtonChange={newSize}
+        onSelectedTabChange={getTab}
+        /> 
+
+      <QuantityCounter onSelectedButtonChange={newQuantity}/>
 
       <div className="selected-button">
-        {selectedButton.length > 0 && (
+        {sizeSelect.length > 0 && (
           <p>
-            Selected button (parent): {selectedButton.join(", ")}
+            Selected Size: {sizeSelect.join(", ")}
           </p>
         )}
       </div>
-      <button onClick={navigateToCustomize}>Customize</button>
+      
+      <div className="selected-button">
+        {smoothieSelect.length > 0 && (
+          <p>
+            Selected Smoothie: {smoothieSelect.join(", ")}
+          </p>
+        )}
+      </div>
+
+      <button onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Customize</button>
+      <button onClick={addToOrder} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Add To Order</button>
+      <button onClick={navigateToCheckout} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Checkout</button>
     </>
   )
 }
