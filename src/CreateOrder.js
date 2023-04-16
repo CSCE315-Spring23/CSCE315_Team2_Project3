@@ -12,6 +12,7 @@ export default function CreateOrder() {
   const [smoothieSelect, setSmoothie] = useState('');
   const [sizeSelect, setSize] = useState('');
   const [quantity, setQuantity] = useState('');
+  const [selectedTab, setSelectedTab] = useState('');
 
   const navigateToCustomize = () => {
     navigate('/Customize');
@@ -22,8 +23,7 @@ export default function CreateOrder() {
   
   const addToOrder = () => {
   };
-
-  const [selectedTab, setSelectedTab] = useState('');
+  
   const getTab = (newSelectedButton) => {
     setSelectedTab(newSelectedButton);
   };
@@ -50,7 +50,7 @@ export default function CreateOrder() {
 
       <TabbedPane tabTitles={sizeTit} 
         tabContent={sizeCont} 
-        multipleSelections={true} 
+        multipleSelections={false} 
         onSelectedButtonChange={newSize}
         onSelectedTabChange={getTab}
         /> 
