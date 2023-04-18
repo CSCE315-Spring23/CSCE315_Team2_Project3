@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import './Background.css';
 
 const Manager = () => {
   const navigate = useNavigate();
@@ -26,11 +26,11 @@ const Manager = () => {
   };
 
   return (
-    <div style= "heading_manager">
-      <header style = "heading_manage_style">
-        <h1 style={{ margin: 1 }}>Manager Dashboard</h1>
+    <div className="manager-container">
+      <header className='manager-header'>
+        <h1 className='manager-title'>Manager Dashboard</h1>
       </header>
-      <div style={{ padding: '1rem' }}>
+      <div className='manager-buttons'>
         <button onClick={navigateToUpdatePrice}>Update Price</button>
         <button onClick={navigateToRestock}>Restock Inventory</button>
         <button onClick={navigateToCreateOrder}>Create Order</button>

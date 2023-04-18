@@ -27,13 +27,18 @@ export default function Home() {
 
   return (
     <>
-      <div>
-        <button onClick={navigateToManager}>Manager</button>
-        <button onClick={navigateToEmployee}>Employee</button>
-        <button onClick={navigateToCustomer}>Customer</button>
-        <button onClick={navigateToMenuBoard}>Menu</button>
-      </div>
-    
+      <div className="manager-container">
+        <header className='manager-header'>
+          <h1 className='manager-title'>Home Dashboard</h1>
+        </header>
+        <div className='manager-buttons'></div>
+          <div>
+            <button onClick={navigateToManager}>Manager</button>
+            <button onClick={navigateToEmployee}>Employee</button>
+            <button onClick={navigateToCustomer}>Customer</button>
+            <button onClick={navigateToMenuBoard}>Menu</button>
+          </div>
+    </div>
     </>
   )
 }
