@@ -29,6 +29,7 @@ export default function Home() {
   return (
     <>
       <div className="manager-container">
+        <div className="logo"></div>
         <header className='manager-header'>
           <h1 className='manager-title'>Home Dashboard</h1>
         </header>

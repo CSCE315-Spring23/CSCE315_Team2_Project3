@@ -31,3 +31,14 @@
     margin-right: 0;
   }
   
+  .logo {
+    background-image: url('smoothie_king_logo.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 250px;
+    height: 140px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+  }
+  
