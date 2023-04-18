@@ -418,17 +418,17 @@ async function handleInventory(smoothieList, sizeList) {
   }
 }
 
-//15 -> NOT DONE -> returnig empty array
+//15 -> DONE -> returnig correct array
 async function getIngredients(smoothie_name) {
   const ingredients = [];
 
   try {
-    const sqlStatement = `SELECT * FROM menu WHERE smoothie_name = '${smoothie_name}'`;
-    const result = await pool.query(sqlStatement);
+    const sqlStatement = 'SELECT * FROM menu WHERE smoothie_name = $1';
+    const result = await pool.query(sqlStatement, [smoothie_name]);
 
-    for (let i = 0; i < result.length; i++) {
-      ingredients.push(result[i]['ingredient']);
-    }
+    result.rows.forEach(row => {
+      ingredients.push(row.ingredient);
+    });
 
   } catch (e) {
     console.error(e);
@@ -437,34 +437,155 @@ async function getIngredients(smoothie_name) {
   return ingredients;
 }
 
-//getIngredients("keto_champ_berry");
-getIngredients('smoothie_name')
+//TESTING
+/*
+getIngredients("caribbean_way")
   .then((ingredients) => console.log(ingredients))
   .catch((error) => console.error(error));
-
-async function checkSmoothieAvailable(smoothie_name) {
-  // TODO: improve efficiency by checking inventory first
-  const ingredients = getIngredients(smoothie_name);
+  */
   
-  // Iterate over all ingredients in smoothie
-  for(const item of ingredients) {
+  //16 -> DONE
+  async function checkSmoothieAvailable(smoothie_name) {
+    //TODO: improve efficiency by checking inventory first
+    const ingredients = await getIngredients(smoothie_name);
+    
+  
+    // iterate over all ingredients in smoothie
+    for (const item of ingredients) {
+      try {
+        // get item quantity
+        const sqlStatement = `SELECT * FROM inventory WHERE ingredient = '${item}';`;
+        const result = await pool.query(sqlStatement);
+  
+        // if quantity for any ingredient is 0, the smoothie is NOT available
+        if (parseInt(result.rows[0].quantity) <= 0) {
+          return false;
+        }
+      } catch (e) {
+        // console.error(e);
+      }
+    }
+    // if all items are available, smoothie is available
+    return true;
+  }
+  
+  //17 -> DONE
+  async function checkItemAvailable(item) {
     try {
-      // Get item quantity
-      const sqlStatement = `SELECT * FROM inventory WHERE ingredient = '${item}'`;
+      // get item quantity
+      const sqlStatement = `SELECT * FROM inventory WHERE ingredient = '${item}';`;
       const result = await pool.query(sqlStatement);
-      const row = result[0];
-
-      // If quantity for any ingredient is 0, the smoothie is NOT available
-      if(parseInt(row[1]) <= 0) {
+  
+      // if quantity is 0, item is unavailable
+      if (parseInt(result.rows[0].quantity) <= 0) {
         return false;
       }
+    } catch (e) {
+      // console.error(e);
+    }
+  
+    // item is available
+    console.log(`${item} is available.`);
+    return true;
+    
+  }
+  
+  //18 -> DONE
+  async function getID() {
+    try {
+      // get and return the maximum order ID (most recent)
+      const sqlStatement = "SELECT MAX(CAST(order_id AS INT)) FROM smoothie_order;";
+      const result = await pool.query(sqlStatement);
+      return result.rows[0].max;
+    } catch (e) {
+      // console.error(e);
+    }
+  
+    return "";
+  }
+  
+  //19 -> DONE
+  async function sendQuery(sqlStatement) {
+    try {
+      await pool.query(sqlStatement);
+    } catch (e) {
+      // console.error(e);
+    }
+  }
+  
+  //20 -> DONE
+  async function getRestockReport() {
+    try {
+      const selectQuery = `SELECT * FROM inventory WHERE quantity < ${max_invent_quant};`;
+      const rs = await pool.query(selectQuery);
+  
+      // Create an array labeled restockList to hold the items
+      const restockList = [];
+      restockList.push(`Fill level for each item is below ${max_invent_quant}. Please restock the following items:`);
+      let count = 1;
+  
+      while (rs.rows.length > 0) {
+        const itemName = rs.rows[0][0];
+        const itemQuant = rs.rows[0][1];
+        const item = `${count}. ${itemName}: ---> Current Amount: ${itemQuant}, --- amount needed: ${max_invent_quant - parseInt(itemQuant)}`;
+        restockList.push(item);
+        count++;
+        rs.rows.shift();
+      }
+  
+      return restockList;
+    } catch (e) {
+      // console.error(e);
+    }
+  
+    return null;
+  }
+  
+  //21 -> DONE
+  async function getInventory() {
+    try {
+      const selectQuery = "SELECT * FROM inventory";
+      const rs = await pool.query(selectQuery);
+  
+      const inventoryList = [];
+      let count = 1;
+  
+      inventoryList.push("Inventory:");
+  
+      rs.rows.forEach((row) => {
+        const itemName = row[0];
+        const itemQuant = row[1];
+  
+        const item = `${itemName}: ---> Current Amount: ${itemQuant}`;
+        inventoryList.push(`${count}. ${item}`);
+        count++;
+      });
+  
+      return inventoryList;
     } catch (err) {
       console.error(err);
     }
   }
   
-  // If all items are available, smoothie is available
-  return true;
-}
+  //22 -> DONE
+  async function restockingInventory() {
+    try {
+      const inventoryToRestock = await getRestockReport();
+      if (!inventoryToRestock) {
+        // console.log("No items need to be restocked.");
+        return;
+      }
+      for (const item of inventoryToRestock) {
+        if (!item) {
+          break;
+        }
+        const updateQuery = `UPDATE inventory SET quantity = ${max_invent_quant} WHERE ingredient = '${item}'`;
+        // console.log(updateQuery);
+        await pool.query(updateQuery);
+        // console.log(`${item} restocked!`);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-//checkSmoothieAvailable("keto_champ_berry");
