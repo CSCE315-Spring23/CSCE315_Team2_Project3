@@ -1,5 +1,6 @@
 import React from 'react'
 import {useNavigate} from 'react-router-dom';
+import './Background.css';
 
 export default function Home() {
 
@@ -10,7 +11,7 @@ export default function Home() {
     navigate('/Employee');
   };
   const navigateToManager = () => {
-    // 👇️ navigate to /contacts
+    // 👇️ navigate to /Manager
     navigate('/Manager');
   };
 
@@ -31,8 +32,7 @@ export default function Home() {
         <header className='manager-header'>
           <h1 className='manager-title'>Home Dashboard</h1>
         </header>
-        <div className='manager-buttons'></div>
-          <div>
+          <div className='manager-buttons'>
             <button onClick={navigateToManager}>Manager</button>
             <button onClick={navigateToEmployee}>Employee</button>
             <button onClick={navigateToCustomer}>Customer</button>
