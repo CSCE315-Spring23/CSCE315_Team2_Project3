@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 const Manager = () => {
   const navigate = useNavigate();
 
@@ -25,11 +26,8 @@ const Manager = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#a93439',
-     color: '#fff', 
-     minHeight: '100vh' }}>
-      <header style={{ backgroundColor: '#d13239', 
-      padding: '3rem' }}>
+    <div style= "heading_manager">
+      <header style = "heading_manage_style">
         <h1 style={{ margin: 1 }}>Manager Dashboard</h1>
       </header>
       <div style={{ padding: '1rem' }}>
