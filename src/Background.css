@@ -1,0 +1,44 @@
+.manager-container {
+    background-color: #a93439;
+    color: #fff;
+    min-height: 100vh;
+  }
+  
+  .manager-header {
+    background-color: #d13239;
+    padding: 3rem;
+  }
+  
+  .manager-title {
+    margin: 1rem;
+  }
+  
+  .manager-buttons {
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .manager-buttons button {
+    background-color: #fff;
+    color: #a93439;
+    border: none;
+    padding: 1rem 2rem;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+  
+  .manager-buttons button:last-child {
+    margin-right: 0;
+  }
+  
+  .logo {
+    background-image: url('smoothie_king_logo.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 250px;
+    height: 140px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+  }
+  

@@ -12,10 +12,14 @@ export default function UpdatePrice() {
 
   return (
     <>
-      <div>
-        This is the Update Price Page
-      </div>
-      <button onClick={navigateToManager}>Exit</button>
+      <div className="manager-container">
+        <header className='manager-header'>
+          <h1 className='manager-title'>Update Price Dashboard</h1>
+        </header>
+        <div className='manager-buttons'>
+          <button onClick={navigateToManager}>Exit</button>
+        </div>
+    </div>
     </>
   )
 }
