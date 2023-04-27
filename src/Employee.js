@@ -14,10 +14,15 @@ export default function Employee() {
   };
   return (
     <>
-        <div>
+      <div className="manager-container">
+        <header className='manager-header'>
+          <h1 className='manager-title'>Employee Dashboard</h1>
+        </header>
+        <div className='manager-buttons'>
           <button onClick={navigateToCreateOrder}>Create Order</button>
           <button onClick={navigateHome}>Logout</button>
         </div>
+      </div>
     </>
   )
 }
