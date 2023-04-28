@@ -52,7 +52,7 @@ export default function Home() {
             <button onClick={navigateToEmployee}>Employee</button>
             <button onClick={navigateToCustomer}>Customer</button>
             <button onClick={navigateToMenuBoard}>Menu</button>
-            <div>{data.main ? <h1>{Math.ceil(data.main.temp)}</h1> : null}</div>
+          <div>{data.main ? <h1>{Math.ceil(data.main.temp)}</h1> : null}</div>
           </div>
     </div>
     </>
