@@ -17,13 +17,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-<<<<<<< HEAD
-    "start": "react-scripts  start",
-    "build": "react-scripts --openssl-legacy-provider build",
-=======
-    "start": "react-scripts start",
-    "build": "react-scripts build",
->>>>>>> kirk-front
+    "start": "react-scripts start --openssl-legacy-provider",
+    "build": "react-scripts build --openssl-legacy-provider",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
