@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "./styles/counter.css";
 
 export default function QuantityCounter(props) {
   const [quantity, setQuantity] = useState(1);
@@ -16,10 +17,10 @@ export default function QuantityCounter(props) {
   };
 
   return (
-    <div>
-      <button onClick={handleDecrement}>-</button>
+    <div className='counter'>
+      <button className='quant-button' onClick={handleDecrement}>-</button>
       <span>{quantity}</span>
-      <button onClick={handleIncrement}>+</button>
+      <button className='quant-button' onClick={handleIncrement}>+</button>
     </div>
   );
 }

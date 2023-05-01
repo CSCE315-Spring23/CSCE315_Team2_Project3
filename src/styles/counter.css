@@ -1,0 +1,23 @@
+.counter {
+
+    justify-content: center;
+    display: flex;
+    
+}
+
+.quant-button {
+
+    background-color: white;
+    border: maroon solid;
+    border-radius: 5px;
+    color: #a93439;
+    transition: ease-in-out 0.25s;
+
+}
+
+.quant-button:hover {
+
+    background-color: #a93439;
+    color: white;
+
+}
