@@ -1,6 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
-const dotenv = require('dotenv').config();
+const cors = require('cors');
+const dotenv = require('dotenv').config({ path: './connect.env' });
 // Create express app
 const app = express();
 const port = 3000;
@@ -14,6 +15,11 @@ const pool = new Pool({
   ssl: {rejectUnauthorized: false}
 });
 
+// allow client port
+app.use(cors({
+  origin: 'http://localhost:3001'
+}));
+
 // Add process hook to shutdown pool
 process.on('SIGINT', function() {
   pool.end();
@@ -21,6 +27,58 @@ process.on('SIGINT', function() {
   process.exit(0);
 });
 
+app.get('/max-order-id', (req, res) => { // how to start a function, req=in and res=out
+  //console.log(pool);
+  pool
+    .query('SELECT MAX(CAST(order_id AS INTEGER)) FROM smoothie_order;') //sends query
+    .then(result => { // .then is what to do with query result
+      console.log(''+result.rows[0]['max']);
+      res.status(200).json(result.rows[0]['max']); //use .json for sending data
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+app.get('/blend-list', (req, res) => {
+  console.log(pool);
+  pool
+    .query('SELECT DISTINCT blend_type FROM menu;')
+    .then(result => {
+      const blends = [];
+      result.rows.forEach(row => blends.push(row.blend_type));
+      const data = {blends};
+      console.log(data);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+app.get('/smoothies-in-blend/:blend', (req, res) => {
+  const blend = req.params.blend;
+  console.log(pool);
+  pool
+    .query('SELECT DISTINCT smoothie_name FROM menu WHERE blend_type = \'' + blend +'\';')
+    .then(result => {
+      const smoothies = [];
+      result.rows.forEach(row => smoothies.push(row.smoothie_name));
+      const data = {smoothies};
+      console.log(data);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+app.listen(port, () => 
+  console.log(`Server running on port ${port}`)
+);
 
 //This is just a example functions
 function updateInventoryQuantity() {
@@ -44,6 +102,10 @@ let prevDate = "";
 let max_invent_quant;
 //1 -> DONE
 //helper to add item to order
+
+/*
+/:param1/:param2
+*/
 function handleOrder(newOrder, smoothieList, sizeList, date) {
   for (let i = 0; i < smoothieList.length; i++) {
     let price = getItemPrice(smoothieList[i]);
@@ -324,10 +386,7 @@ async function XReport(id) {
   return order_info;
 }
 
-module.exports = {
-  XReport,
-  pool,
-};
+
 
 //11 DONE
 async function getOrder(order_id) {
@@ -589,3 +648,4 @@ getIngredients("caribbean_way")
     }
   }
 
+module.exports = {app, getID};
