@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
+// import {Translate} from '@google-cloud/translate';
+require('dotenv').config();
 
 export default function Home() {
 
@@ -38,8 +40,6 @@ export default function Home() {
 
   });
 
-  console.log(data.main);
-
   return (
     <>
       <div className="manager-container">
@@ -54,7 +54,7 @@ export default function Home() {
             <button onClick={navigateToMenuBoard}>Menu</button>
             <div>{data.main ? <h1>{Math.ceil(data.main.temp)}</h1> : null}</div>
           </div>
-    </div>
+      </div>
     </>
   )
 }
