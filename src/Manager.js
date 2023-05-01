@@ -27,6 +27,7 @@ const Manager = () => {
 
   return (
     <div className="manager-container">
+      <div className="logo"></div>
       <header className='manager-header'>
         <h1 className='manager-title'>Manager Dashboard</h1>
       </header>

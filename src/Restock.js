@@ -11,10 +11,15 @@ export default function Restock() {
 
   return (
     <>
-      <div>
-        This is the Restock Page
-      </div>
-      <button onClick={navigateToManager}>Exit</button>
+      <div className="manager-container">
+        <div className="logo"></div>
+        <header className='manager-header'>
+          <h1 className='manager-title'>Restock Dashboard</h1>
+        </header>
+        <div className='manager-buttons'>
+          <button onClick={navigateToManager}>Exit</button>
+        </div>
+    </div>
     </>
   )
 }

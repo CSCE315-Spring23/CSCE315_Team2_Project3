@@ -25,6 +25,7 @@
     padding: 1rem 2rem;
     margin-right: 1rem;
     cursor: pointer;
+    border-radius: 10px;
   }
   
   .manager-buttons button:last-child {
@@ -40,5 +41,20 @@
     position: absolute;
     top: 15px;
     left: 15px;
+  }
+  
+  .search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .search-container input {
+    margin-right: 10px;
+  }
+  
+  .clicked {
+    background-color: #4e4e4e;
   }
   
