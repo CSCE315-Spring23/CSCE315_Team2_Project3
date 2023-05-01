@@ -1,13 +1,12 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
+import { useState } from 'react';
 import Header from './Header';
 import QuantityCounter from './QuantityCounter';
 //import arrays from another file
 import { titles, contents, sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
 import './styles/OrderStyle.css';
-import { useState, useEffect } from 'react';
-import { getBlendList } from './index2';
 
 export default function CreateOrder() {
   const navigate = useNavigate();
@@ -15,7 +14,6 @@ export default function CreateOrder() {
   const [sizeSelect, setSize] = useState('');
   const [quantity, setQuantity] = useState('');
   const [selectedTab, setSelectedTab] = useState('');
-  
 
   const navigateToCustomize = () => {
     navigate('/Customize');
@@ -25,7 +23,6 @@ export default function CreateOrder() {
   };
   
   const addToOrder = () => {
-    
   };
   
   const getTab = (newSelectedButton) => {
@@ -40,7 +37,7 @@ export default function CreateOrder() {
   const newQuantity = (newSelectedButton) => {
     setQuantity(newSelectedButton);
   };
-  
+
   return (
     <>
       <Header pageTitle="Create Order"/>
