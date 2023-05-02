@@ -27,6 +27,11 @@
     cursor: pointer;
     border-radius: 10px;
   }
+
+  .manager-buttons button:hover {
+    background-color: #5f2326;
+    color: #fff;
+  }s
   
   .manager-buttons button:last-child {
     margin-right: 0;
