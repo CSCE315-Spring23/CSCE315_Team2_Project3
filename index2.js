@@ -133,6 +133,100 @@ app.get('/ingredients-in-smoothie/:smoothie', (req, res) => {
     });
 });
 
+app.get('/item-price/:smoothie', (req, res) => {
+  const smoothie = req.params.smoothie;
+  const sqlStatement = 'SELECT price FROM prices WHERE smoothie=$1';
+  pool.query(sqlStatement, [smoothie])
+    .then(result => {
+      if (result.rowCount === 0) {
+        res.status(404).json({ error: `No price found for ${smoothie}` });
+      } else {
+        const price = result.rows[0].price;
+        res.status(200).json({ price });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+app.get('/order-total/:orderID', (req, res) => {
+  const orderID = req.params.orderID;
+  const sqlStatement = 'SELECT price FROM smoothie_order WHERE order_id=$1';
+  pool.query(sqlStatement, [orderID])
+    .then(result => {
+      let total = 0.0;
+      result.rows.forEach(row => {
+        total += row.price;
+      });
+      res.status(200).json({ total });
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+app.get('/check-item-available/:item', (req, res) => {
+  const item = req.params.item;
+  const sqlStatement = 'SELECT quantity FROM inventory WHERE ingredient=$1';
+  pool.query(sqlStatement, [item])
+    .then(result => {
+      if (result.rowCount === 0) {
+        res.status(404).json({ error: `No inventory found for ${item}` });
+      } else if (parseInt(result.rows[0].quantity) <= 0) {
+        res.status(200).json({ available: false });
+      } else {
+        res.status(200).json({ available: true });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+app.get('/check-smoothie-available/:smoothie_name', (req, res) => {
+  const smoothieName = req.params.smoothie_name;
+  getIngredients(smoothieName)
+    .then(ingredients => {
+      const sqlStatement = 'SELECT quantity FROM inventory WHERE ingredient = ANY($1::text[])';
+      return pool.query(sqlStatement, [ingredients]);
+    })
+    .then(result => {
+      const unavailableItems = result.rows.filter(row => parseInt(row.quantity) <= 0);
+      if (unavailableItems.length > 0) {
+        res.status(200).json({ available: false, unavailable_items: unavailableItems.map(item => item.ingredient) });
+      } else {
+        res.status(200).json({ available: true });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+app.get('/prices/:name/:newPrice', (req, res) => {
+  const name = req.params.name;
+  const newPrice = req.params.newPrice;
+
+  const sqlStatement = `UPDATE prices SET price = '${newPrice}' WHERE smoothie = '${name}'`;
+
+  pool.query(sqlStatement)
+    .then(() => {
+      console.log(`Price for ${name} has been updated to ${newPrice}`);
+      res.status(200).json({ message: `Price for ${name} has been updated to ${newPrice}` });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
+
 app.listen(port, () => 
   console.log('Server running on port',port)
 );
