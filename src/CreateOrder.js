@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import Header from './Header';
 import QuantityCounter from './QuantityCounter';
 //import arrays from another file
-import { titles, contents, sizeTit, sizeCont } from './temp_helper.js';
+import { sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
 import './styles/OrderStyle.css';
 import { useState, useEffect } from 'react';
@@ -18,31 +18,35 @@ export default function CreateOrder() {
   const [orderID, setOrderID] = useState(0);
   const [title_list, setList] = useState([]);
   const [content_list, setContent] = useState([[]]);
-
-  useEffect(() => {
-    axios.get('http://localhost:3000/max-order-id').then((response) => {
+  /*
+  axios.get('http://localhost:3000/max-order-id').then((response) => {
       setOrderID(response.data);
       console.log(response.data);
     });
-
-    axios.get('http://localhost:3000/blend-list').then((response) => {
-      const blendsList = response.data.blends;
+  */
+  useEffect(() => {
+    const fetchData = async () => {
+      const orderResponse = await axios.get('http://localhost:3000/max-order-id');
+      setOrderID(orderResponse.data);
+      console.log(orderResponse.data);
+  
+      const blendResponse = await axios.get('http://localhost:3000/blend-list');
+      const blendsList = blendResponse.data.blends;
       console.log(blendsList);
-      setList(response.data.blends);
-    });
-    
-    const content = [[]]
-    const blend = "enjoy_a_treat";
-    console.log(blend);
-    axios.get('http://localhost:3000/smoothies-in-blend/enjoy_a_treat/').then((response) => {
-      const sml = response.data.smoothies;
-      console.log(sml);
-      content.push(sml);
-    });
-
-    setContent(content);
-
-  }, [ ])
+      setList(blendsList);
+  
+      const content = [];
+      for ( let i=0; i<blendsList.length; i++) {
+        const smoothieResponse = await axios.get(`http://localhost:3000/smoothies-in-blend/${blendsList[i]}`);
+        const sml = smoothieResponse.data.smoothies;
+        console.log(sml);
+        content[i] = sml;
+      }
+      setContent(content);
+    };
+  
+    fetchData();
+  }, []);
 
   const navigateToCustomize = () => {
     navigate('/Customize');
@@ -84,7 +88,7 @@ export default function CreateOrder() {
       />
 
       <TabbedPane tabTitles={title_list} 
-        tabContent={contents} 
+        tabContent={content_list} 
         multipleSelections={false}
         onSelectedButtonChange={newSmoothie}
         onSelectedTabChange={getTab}

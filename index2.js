@@ -133,6 +133,71 @@ app.get('/ingredients-in-smoothie/:smoothie', (req, res) => {
     });
 });
 
+app.get('/salesReport/:start/:end/:smoothieName', (req, res) => {
+  const { start, end, smoothieName } = req.params;
+
+  const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothieName}')`;
+
+  pool.query(sqlStatement)
+    .then(result => {
+      let order_info = "";
+      if (result && result.rows.length > 0) {
+        order_info = `Number of orders between ${start} and ${end} for ${smoothieName}: ${result.rows[0].count}`;
+      } else {
+        order_info = `No orders found between ${start} and ${end} for ${smoothieName}`;
+      }
+      console.log(order_info);
+      res.status(200).json(order_info);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+app.get('/handleOrder/:orderID/:smoothieList/:sizeList/:date', (req, res) => {
+  const { orderID, smoothieList, sizeList, date } = req.params;
+
+  const smoothies = smoothieList.split(',');
+  const sizes = sizeList.split(',');
+
+  for (let i = 0; i < smoothies.length; i++) {
+    let price = getItemPrice(smoothies[i]);
+    let size = sizes[i];
+
+    // Adjust price based on size
+    switch (size) {
+      case "12":
+        price *= 0.75;
+        break;
+      case "20":
+        break;
+      case "32":
+        price *= 1.25;
+        break;
+      case "40":
+        price *= 1.5;
+        break;
+      default:
+        break;
+    }
+
+    const sqlStatement = `INSERT INTO smoothie_order (order_id, smoothie_array, smoothie_sizes_array, date, price) VALUES ('${orderID}', '${smoothies[i]}', '${sizes[i]}', '${date}', ${price})`;
+    console.log(sqlStatement);
+
+    pool.query(sqlStatement)
+      .then(() => {
+        handleInventory(smoothies, sizes);
+      })
+      .catch(error => {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+      });
+  }
+
+  res.status(200).json({ message: 'Order successfully handled' });
+});
+
 app.listen(port, () => 
   console.log('Server running on port',port)
 );
