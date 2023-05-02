@@ -225,6 +225,72 @@ app.get('/prices/:name/:newPrice', (req, res) => {
     });
 });
 
+app.get('/handle-inventory/:smoothieList/:sizeList', async (req, res) => {
+  try {
+    const smoothieList = req.params.smoothieList.split(',');
+    const sizeList = req.params.sizeList.split(',');
+    const ingredients = await getIngredients(smoothieList[0]);
+
+    for (const item of ingredients) {
+      const sqlStatement = `UPDATE inventory SET quantity = quantity - 1 WHERE ingredient = '${item}'`;
+      console.log(sqlStatement);
+      await pool.query(sqlStatement);
+    }
+
+    res.status(200).json({ message: 'Inventory updated successfully' });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Error updating inventory' });
+  }
+});
+
+app.get('/inventory', (req, res) => {
+  const selectQuery = 'SELECT * FROM inventory';
+  pool.query(selectQuery)
+    .then((result) => {
+      const inventoryList = [];
+      let count = 1;
+      inventoryList.push('Inventory:');
+      result.rows.forEach((row) => {
+        const itemName = row.ingredient;
+        const itemQuant = row.quantity;
+        const item = `${itemName}: ---> Current Amount: ${itemQuant}`;
+        inventoryList.push(`${count}. ${item}`);
+        count++;
+      });
+      res.status(200).json(inventoryList);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error retrieving inventory');
+    });
+});
+
+app.get('/restockReport', (req, res) => {
+  const selectQuery = `SELECT * FROM inventory WHERE quantity < ${max_invent_quant};`;
+  pool.query(selectQuery)
+    .then(rs => {
+      const restockList = [];
+      restockList.push(`Fill level for each item is below ${max_invent_quant}. Please restock the following items:`);
+      let count = 1;
+  
+      while (rs.rows.length > 0) {
+        const itemName = rs.rows[0][0];
+        const itemQuant = rs.rows[0][1];
+        const item = `${count}. ${itemName}: ---> Current Amount: ${itemQuant}, --- amount needed: ${max_invent_quant - parseInt(itemQuant)}`;
+        restockList.push(item);
+        count++;
+        rs.rows.shift();
+      }
+
+      res.send(200).json(restockList);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Error retrieving restock report' });
+    });
+});
+
 
 
 app.listen(port, () => 
