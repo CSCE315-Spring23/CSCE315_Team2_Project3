@@ -34,7 +34,7 @@ export default function CreateOrder() {
     const content = [[]]
     const blend = "enjoy_a_treat";
     console.log(blend);
-    axios.get('http://localhost:3000/smoothies-in-blend/:enjoy_a_treat/').then((response) => {
+    axios.get('http://localhost:3000/smoothies-in-blend/enjoy_a_treat/').then((response) => {
       const sml = response.data.smoothies;
       console.log(sml);
       content.push(sml);

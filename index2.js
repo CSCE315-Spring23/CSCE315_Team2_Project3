@@ -28,18 +28,25 @@ process.on('SIGINT', function() {
 });
 
 app.get('/max-order-id', (req, res) => { // how to start a function, req=in and res=out
-  //console.log(pool);
+
+  // you can add parameters by etending the url with /max-order-id/:param1/:param2
+  // params would go here like this:
+  // const param2 = req.params.param2;
+
   pool
     .query('SELECT MAX(CAST(order_id AS INTEGER)) FROM smoothie_order;') //sends query
     .then(result => { // .then is what to do with query result
-      console.log(''+result.rows[0]['max']);
-      res.status(200).json(result.rows[0]['max']); //use .json for sending data
+      console.log(result.rows[0]['max']); //console.log will display data in the server terminal
+      res.status(200).json(result.rows[0]['max']); // ALWAYS use .status(200).json(...) for sending data
     })
+
+    // error crap
     .catch(error => {
       console.log(error);
       res.status(500).send('Internal Server Error');
     });
 });
+
 
 app.get('/blend-list', (req, res) => {
   console.log(pool);
@@ -58,9 +65,42 @@ app.get('/blend-list', (req, res) => {
     });
 });
 
+app.get('/smoothie-list', (req, res) => {
+  console.log(pool);
+  pool
+    .query('SELECT DISTINCT smoothie_name FROM menu;')
+    .then(result => {
+      const smoothies = [];
+      result.rows.forEach(row => smoothies.push(row.smoothie_name));
+      const data = {smoothies};
+      console.log(data);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+app.get('/get-all-ingredients', (req, res) => {
+  console.log(pool);
+  pool
+    .query('SELECT DISTINCT ingredient FROM menu;')
+    .then(result => {
+      const ingredients = [];
+      result.rows.forEach(row => ingredients.push(row.ingredient));
+      const data = {ingredients};
+      console.log(data);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
 app.get('/smoothies-in-blend/:blend', (req, res) => {
   const blend = req.params.blend;
-  console.log(pool);
   pool
     .query('SELECT DISTINCT smoothie_name FROM menu WHERE blend_type = \'' + blend +'\';')
     .then(result => {
@@ -76,9 +116,28 @@ app.get('/smoothies-in-blend/:blend', (req, res) => {
     });
 });
 
+app.get('/ingredients-in-smoothie/:smoothie', (req, res) => {
+  const smoothie = req.params.smoothie;
+  pool
+    .query('SELECT DISTINCT ingredient FROM menu WHERE smoothie_name = \'' + smoothie +'\';')
+    .then(result => {
+      const ingredients = [];
+      result.rows.forEach(row => ingredients.push(row.ingredient));
+      const data = {ingredients};
+      console.log(data);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
 app.listen(port, () => 
-  console.log(`Server running on port ${port}`)
+  console.log('Server running on port',port)
 );
+
+module.exports = app;
 
 //This is just a example functions
 function updateInventoryQuantity() {
@@ -647,5 +706,3 @@ getIngredients("caribbean_way")
       console.error(err);
     }
   }
-
-module.exports = {app, getID};
