@@ -12,7 +12,7 @@ import Reports from './Reports';
 import Customer from './Customer';
 import Checkout from './Checkout';
 import MenuBoard from './MenuBoard';
-import Test from './Test';
+import Test from './test';
 import './Background.css';
 
 function App() {
