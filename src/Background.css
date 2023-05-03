@@ -41,4 +41,9 @@
     top: 15px;
     left: 15px;
   }
+  .weather {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
   
