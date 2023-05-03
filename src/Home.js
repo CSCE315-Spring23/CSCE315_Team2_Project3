@@ -35,6 +35,7 @@ export default function Home() {
   const weatherURL =
   "https://api.openweathermap.org/data/2.5/weather?lat=30.6181&lon=-96.34&units=imperial&appid=" +
   weatherAPIKey;
+  // const weatherURL = "https://api.openweathermap.org/data/2.5/weather?lat=30.6181&lon=-96.34&units=imperial&appid=bf2654fa7c7181f891ee8e383e28dd81";
 
 
   useEffect(() => {
