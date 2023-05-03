@@ -25,7 +25,13 @@
     padding: 1rem 2rem;
     margin-right: 1rem;
     cursor: pointer;
+    border-radius: 10px;
   }
+
+  .manager-buttons button:hover {
+    background-color: #5f2326;
+    color: #fff;
+  }s
   
   .manager-buttons button:last-child {
     margin-right: 0;
@@ -40,5 +46,20 @@
     position: absolute;
     top: 15px;
     left: 15px;
+  }
+  
+  .search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .search-container input {
+    margin-right: 10px;
+  }
+  
+  .clicked {
+    background-color: #4e4e4e;
   }
   

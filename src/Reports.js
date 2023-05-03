@@ -11,10 +11,15 @@ export default function Reports() {
 
   return (
     <>
-      <div>
-        This is the Reports Page
-      </div>
-      <button onClick={navigateToManager}>Exit</button>
+      <div className="manager-container">
+        <div className="logo"></div>
+        <header className='manager-header'>
+          <h1 className='manager-title'>Reports Dashboard</h1>
+        </header>
+        <div className='manager-buttons'>
+          <button onClick={navigateToManager}>Exit</button>
+        </div>
+    </div>
     </>
   )
 }
