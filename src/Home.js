@@ -4,6 +4,7 @@ import axios from "axios";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 import Profile from "./Profile";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function Home() {
   const managerEmails = ["carlos_casellas@tamu.edu"];
@@ -38,6 +39,7 @@ export default function Home() {
   // const [location, setLocation] = useState("");
   const [weatherLoaded, setWeatherLoaded] = useState(false);
   const [weatherInfo, setWeatherInfo] = useState({});
+  const { isAuthenticated } = useAuth0();
 
   const weatherAPIKey = process.env.REACT_APP_WEATHER_API_KEY;
   const weatherURL =
@@ -73,9 +75,9 @@ export default function Home() {
           )}
         </header>
         <div className="manager-buttons">
-          <div className="login" >
+          <div className={`login ${isAuthenticated ? "authenticated" : ""}`} >
             <LoginButton />
-            
+            {isAuthenticated && <div className="profile"></div>}
           </div>
           <button onClick={navigateToManager}>Manager</button>
           <button onClick={navigateToEmployee}>Employee</button>
@@ -85,7 +87,7 @@ export default function Home() {
             <LogoutButton />
           </div>
 
-          <div className="profile">
+          <div >
             <Profile />
           </div>
         </div>
