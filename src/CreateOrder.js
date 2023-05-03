@@ -6,6 +6,7 @@ import QuantityCounter from './QuantityCounter';
 //import arrays from another file
 import { titles, contents, sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
+import './styles/OrderStyle.css';
 
 export default function CreateOrder() {
   const navigate = useNavigate();
@@ -76,9 +77,9 @@ export default function CreateOrder() {
         )}
       </div>
 
-      <button onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Customize</button>
-      <button onClick={addToOrder} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Add To Order</button>
-      <button onClick={navigateToCheckout} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Checkout</button>
+      <button className="bottom-buttons" onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Customize</button>
+      <button className="bottom-buttons" onClick={addToOrder} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Add To Order</button>
+      <button className="bottom-buttons" onClick={navigateToCheckout} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Checkout</button>
     </>
   )
 }

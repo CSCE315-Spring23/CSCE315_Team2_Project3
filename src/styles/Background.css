@@ -1,0 +1,108 @@
+.manager-container {
+  background-color: #a93439;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.manager-header {
+  background-color: #d13239;
+  padding: 3rem;
+}
+
+.manager-title {
+  font-family: 'Gotham Rounded Bold Italic', sans-serif;
+  margin: 1rem;
+}
+
+.manager-buttons {
+  text-align: center;
+  padding: 1rem;
+}
+
+.manager-buttons button {
+  width: max-content;
+  height: 7vh;
+  font-family: 'Gotham Rounded Bold Italic', sans-serif;
+  background-color: #fff;
+  color: #a93439;
+  border: #e84a52 solid 2px;
+  padding: 1rem 2rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: ease-in-out 0.25s;
+  box-shadow: inset 0 3px 8px rgba(150, 150, 150, 0.5);
+}
+
+.manager-buttons button:hover {
+  background-color: #5f2326;
+  color: #fff;
+  border: white solid 2px;
+}
+
+.manager-buttons button:last-child {
+  margin-right: 0;
+}
+
+.logo {
+  background-image: url("./images/smoothie_king_logo.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 140px;
+  height: 140px;
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  border-radius: 25px;
+  border: #a93439 solid 3px;
+  box-shadow: inset 0 3px 8px rgba(150, 150, 150, 0.7);
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.search-container input {
+  margin-right: 10px;
+}
+
+@font-face {
+  font-family: 'Gotham Rounded Bold Italic';
+  src: url('./fonts/GothamRounded-BoldItalic.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+.weather {
+  font-family: 'Gotham Rounded Bold Italic', sans-serif; 
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.manager-buttons .login {
+  background-color: #5a1d20;
+  color: #fff;
+  display: inline-block;
+  padding: 10px 10px;
+  border-radius: 10px;
+}
+
+.manager-buttons .logout {
+  background-color: #dc3545;
+  color: #fff;
+  display: inline-block;
+  padding: 10px 10px;
+  border-radius: 10px;
+}
+
+.manager-buttons .profile {
+  background-color: #282ea7;
+  color: #fff;
+  display: inline-block;
+  padding: 10px 10px;
+  border-radius: 10px;
+}
