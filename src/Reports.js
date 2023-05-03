@@ -32,6 +32,7 @@ export default function Reports() {
                 <input id='sales-start-date' className="labeled-input" type="date" name='sales-start'></input>
                 <label for="sales-end">End:</label>
                 <input id='sales-end-date' className="labeled-input" type="date" name='sales-end'></input>
+                <button id='generate-sales-report-btn'>Generate</button>
               </div>
             </section>
 
@@ -42,6 +43,7 @@ export default function Reports() {
                 <input id='excess-start-date' className="labeled-input" type="date" name='excess-start'></input>
                 <label for="excess-end">End:</label>
                 <input id='excess-end-date' className="labeled-input" type="date" name='excess-end'></input>
+                <button id='generate-excess-report-btn'>Generate</button>
               </div>
             </section>
 
