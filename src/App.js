@@ -2,7 +2,6 @@ import React from 'react'
 import {Routes, Route} from 'react-router-dom';
 import Employee from './Employee';
 import Manager from './Manager';
-import login from './login';
 import Customize from './Customize';
 import CreateOrder from './CreateOrder';
 import Home from './Home';
