@@ -20,6 +20,8 @@
 }
 
 .manager-buttons button {
+  width: max-content;
+  height: 7vh;
   font-family: 'Gotham Rounded Bold Italic', sans-serif;
   background-color: #fff;
   color: #a93439;
