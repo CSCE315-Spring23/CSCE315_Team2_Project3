@@ -80,3 +80,18 @@
   top: 20px;
   right: 20px;
 }
+
+.manager-buttons .login {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.manager-buttons .logout {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.manager-buttons .profile {
+  background-color: #28a745;
+  color: #fff;
+}
