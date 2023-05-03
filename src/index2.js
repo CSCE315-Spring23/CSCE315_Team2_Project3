@@ -9,9 +9,9 @@ const pool = new Pool({
   user: process.env.PSQL_USER,
   host: process.env.PSQL_HOST,
   database: process.env.PSQL_DATABASE,
-  
   password: process.env.PSQL_PASSWORD,
-  port: process.env.PSQL_PORT
+  port: process.env.PSQL_PORT,
+  ssl: {rejectUnauthorized: false}
 });
 
 // Add process hook to shutdown pool
@@ -21,6 +21,22 @@ process.on('SIGINT', function() {
   process.exit(0);
 });
 
+app.get('/max-order-id', (req, res) => {
+  console.log(pool);
+  pool
+    .query('SELECT MAX(CAST(order_id AS INTEGER)) FROM smoothie_order;')
+    .then(result => {
+      res.send(result.rows[0]['max']);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+app.listen(port, () => 
+  console.log(`Server running on port ${port}`)
+);
 
 //This is just a example functions
 function updateInventoryQuantity() {
@@ -342,8 +358,6 @@ async function XReport(id) {
   return order_info;
 }
 
-module.exports = { getBlendList };
-
 //11 DONE
 async function getOrder(order_id) {
   let order_info = "";
@@ -605,3 +619,8 @@ getIngredients("caribbean_way")
     }
   }
 
+  module.exports = {
+    getID,
+    XReport,
+    app
+  };

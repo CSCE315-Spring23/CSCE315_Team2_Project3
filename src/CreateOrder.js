@@ -1,12 +1,13 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import Header from './Header';
 import QuantityCounter from './QuantityCounter';
 //import arrays from another file
-import { titles, contents, sizeTit, sizeCont } from './temp_helper.js';
+import { contents, sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
 import './styles/OrderStyle.css';
+import axios from 'axios';
 
 export default function CreateOrder() {
   const navigate = useNavigate();
@@ -14,6 +15,36 @@ export default function CreateOrder() {
   const [sizeSelect, setSize] = useState('');
   const [quantity, setQuantity] = useState('');
   const [selectedTab, setSelectedTab] = useState('');
+  const [orderID, setOrderID] = useState(0);
+  const [title_list, setList] = useState([]);
+  const [content_list, setContent] = useState([[]]);
+
+  console.log(content_list);
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/max-order-id').then((response) => {
+      setOrderID(response.data);
+      console.log(response.data);
+    });
+
+    axios.get('http://localhost:3000/blend-list').then((response) => {
+      const blendsList = response.data.blends;
+      console.log(blendsList);
+      setList(response.data.blends);
+    });
+    
+    const content = [[]]
+    const blend = "enjoy_a_treat";
+    console.log(blend);
+    axios.get('http://localhost:3000/smoothies-in-blend/enjoy_a_treat/').then((response) => {
+      const sml = response.data.smoothies;
+      console.log(sml);
+      content.push(sml);
+    });
+
+    setContent(content);
+
+  }, [ ])
 
   console.log(quantity);
   console.log(selectedTab);
@@ -25,8 +56,18 @@ export default function CreateOrder() {
     navigate('/Checkout');
   };
   
-  const addToOrder = () => {
+  const addToOrder = async () => {    
+    fetch('http://localhost:3000/max-order-id')
+      .then(response => response.json())
+      .then(data => {
+        // Do something with the data, like display it on the page
+        console.log(data);
+        setOrderID(data);
+      })
+      .catch(error => console.error(error));
   };
+
+  
   
   const getTab = (newSelectedButton) => {
     setSelectedTab(newSelectedButton);
@@ -43,11 +84,13 @@ export default function CreateOrder() {
 
   return (
     <>
-      <Header pageTitle="Create Order"/>
+      <Header pageTitle="Create Order"
+        orderID={orderID}
+      />
 
-      <TabbedPane tabTitles={titles} 
+      <TabbedPane tabTitles={title_list} 
         tabContent={contents} 
-        multipleSelections={false} 
+        multipleSelections={false}
         onSelectedButtonChange={newSmoothie}
         onSelectedTabChange={getTab}
         />

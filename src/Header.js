@@ -5,6 +5,7 @@ var title = "title";
 
 export default function Header(props) {
   title = props.pageTitle;
+  orderID = props.orderID;
 
   const current = new Date();
   const date = `${current.getFullYear()}-${
