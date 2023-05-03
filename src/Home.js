@@ -27,13 +27,22 @@ export default function Home() {
 
   const weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=imperial&appid=bf2654fa7c7181f891ee8e383e28dd81`;
 
-  const searchLocation = () => {
-    setButtonClicked(true);
-    axios.get(weatherURL).then((response) => {
-      setData(response.data);
-      setLocation('');
-    });
-  };
+  const weatherAPIKey = process.env.REACT_APP_WEATHER_API_KEY;
+  const weatherURL = "https://api.openweathermap.org/data/2.5/weather?lat=30.6181&lon=-96.34&units=imperial&appid=" + weatherAPIKey;
+  // const weatherURL = "https://api.openweathermap.org/data/2.5/weather?lat=30.6181&lon=-96.34&units=imperial&appid=bf2654fa7c7181f891ee8e383e28dd81";
+
+  useEffect(() => {
+    axios
+      .get(weatherURL)
+      .then((response) => {
+        setWeatherLoaded(true);
+        setWeatherInfo(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   return (
     <>
@@ -57,24 +66,9 @@ export default function Home() {
               </>
             ) : null}
           </div>
-          <div className="search-container">
-            <input
-              placeholder="Enter Location"
-              value={location}
-              type="text"
-              onKeyPress={(event) => {
-                if (event.key === 'Enter') {
-                  searchLocation();
-                }
-              }}
-              onChange={(event) => setLocation(event.target.value)}
-            />
-            <button
-              className={buttonClicked ? 'clicked' : ''}
-              onClick={searchLocation}
-            >
-              Enter
-            </button>
+
+          <div>
+            <Profile />
           </div>
         </div>
       </div>
