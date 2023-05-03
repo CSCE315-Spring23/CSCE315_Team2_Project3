@@ -43,6 +43,7 @@ export default function Home() {
       .then((response) => {
         setWeatherLoaded(true);
         setWeatherInfo(response.data);
+        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
