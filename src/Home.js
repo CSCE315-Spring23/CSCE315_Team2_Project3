@@ -41,10 +41,9 @@ export default function Home() {
 
   const weatherAPIKey = process.env.REACT_APP_WEATHER_API_KEY;
   const weatherURL =
-  "https://api.openweathermap.org/data/2.5/weather?lat=30.6181&lon=-96.34&units=imperial&appid=" +
-  weatherAPIKey;
+    "https://api.openweathermap.org/data/2.5/weather?lat=30.6181&lon=-96.34&units=imperial&appid=" +
+    weatherAPIKey;
   // const weatherURL = "https://api.openweathermap.org/data/2.5/weather?lat=30.6181&lon=-96.34&units=imperial&appid=bf2654fa7c7181f891ee8e383e28dd81";
-
 
   useEffect(() => {
     axios
@@ -71,29 +70,22 @@ export default function Home() {
               <p>High Today: {weatherInfo.main.temp_max} ºF</p>
             </div>
           )}
-
-
-
         </header>
         <div className="manager-buttons">
-          {/* <button onClick={navigateToLogin}>Login</button> */}
           <div>
-            <LoginButton />
+            <LoginButton className="login" />
           </div>
           <button onClick={navigateToManager}>Manager</button>
           <button onClick={navigateToEmployee}>Employee</button>
           <button onClick={navigateToCustomer}>Customer</button>
           <button onClick={navigateToMenuBoard}>Menu</button>
-          {/* /*  <div>{data.main ? <h1>{Math.ceil(data.main.temp)}</h1> : null}</div> */}
-          <div top = "70px">
-            <LogoutButton />
+          <div top="70px">
+            <LogoutButton className="logout" />
           </div>
           <div>
-            <Profile />
+            <Profile className="profile" />
           </div>
-          
         </div>
-
       </div>
     </>
   );
