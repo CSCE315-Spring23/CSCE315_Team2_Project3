@@ -465,6 +465,99 @@ app.get('/handle-customizations/:addOns/:removeList/:id/:name', (req, res) => {
   handleCustomizations(addOns, removeList, id, name);
 });
 
+app.get('/excessReport/:start/:end', async(req, res) => {
+  const { start, end } = req.params;
+
+  const excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
+  try {
+    const ingredients = await getIngredientList();
+    const smoothies = await getSmoothieList();
+    console.log(smoothies);
+
+    // set default counts
+    const dictionary = {};
+    for (const key of ingredients) {
+      dictionary[key] = 0;
+    }
+
+    const promises = smoothies.map((smoothie) => {
+      const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothie}');`;
+
+      return getIngredients(smoothie)
+        .then((itemsToCount) => {
+          return pool.query(sqlStatement)
+            .then((result) => {
+              const quantitySold = result.rows[0].count;
+
+              for (const item of itemsToCount) {
+                dictionary[item] += quantitySold;
+              }
+            });
+        });
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        // check if under 10
+        const keys = Object.keys(dictionary);
+        let excessItems = '';
+        for (const key of keys) {
+          if (dictionary[key] < 10) {
+            excessItems += `\t${key}\tsold: ${dictionary[key]}\n`;
+          }
+        }
+
+        const data = excess + excessItems;
+        res.status(200).json(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send('An error occurred');
+      });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('An error occurred');
+  }
+});
+
+app.get('/restock-report', (req, res) => {
+  pool.query(`SELECT * FROM inventory WHERE quantity < ${max_invent_quant}`)
+    .then(rs => {
+      const restockList = [];
+      restockList.push(`Fill level for each item is below ${max_invent_quant}. Please restock the following items:`);
+      let count = 1;
+
+      for (const item of rs.rows) {
+        const itemName = item.ingredient;
+        const itemQuant = item.quantity;
+        const itemDiff = max_invent_quant - itemQuant;
+        const itemInfo = `${count}. ${itemName}: ---> Current Amount: ${itemQuant}, --- amount needed: ${itemDiff}`;
+        restockList.push(itemInfo);
+        count++;
+      }
+
+      if (count === 1) {
+        restockList.push('No items need to be restocked.');
+      }
+
+      const updatePromises = rs.rows.map((item) => {
+        const updateQuery = `UPDATE inventory SET quantity = ${max_invent_quant} WHERE ingredient = '${item.ingredient}'`;
+        return pool.query(updateQuery);
+      });
+
+      return Promise.all(updatePromises)
+        .then(() => res.status(200).json(restockList))
+        .catch((err) => {
+          console.error(err);
+          res.status(500).send('An error occurred while updating the inventory.');
+        });
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Error retrieving restock report');
+    });
+});
+
 app.listen(port, () => 
   console.log('Server running on port',port)
 );
