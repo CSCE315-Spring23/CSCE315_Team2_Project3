@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Background.css';
+import './styles/Background.css';
 
 const Manager = () => {
   const navigate = useNavigate();
@@ -27,6 +27,7 @@ const Manager = () => {
 
   return (
     <div className="manager-container">
+      <div className="logo"></div>
       <header className='manager-header'>
         <h1 className='manager-title'>Manager Dashboard</h1>
       </header>

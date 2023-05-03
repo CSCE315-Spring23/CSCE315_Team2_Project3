@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-react": "^2.0.2",
+    "@google-cloud/translate": "^7.2.1",
+    "@react-oauth/google": "^0.11.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "gapi-script": "^1.2.0",
     "mysql": "^2.18.1",
-    "pg": "^8.10.0",
-    "pg-native": "^3.0.1",
     "react": "^18.2.0",
     "react-axios": "^2.0.6",
     "react-dom": "^18.2.0",
@@ -20,8 +22,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "start": "react-scripts start",
+    "build": "react-scripts --openssl-legacy-provider build ",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

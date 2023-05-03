@@ -2,7 +2,6 @@ import React from 'react'
 import {Routes, Route} from 'react-router-dom';
 import Employee from './Employee';
 import Manager from './Manager';
-import Manager_login from './Manager_login';
 import Customize from './Customize';
 import CreateOrder from './CreateOrder';
 import Home from './Home';
@@ -12,8 +11,7 @@ import Reports from './Reports';
 import Customer from './Customer';
 import Checkout from './Checkout';
 import MenuBoard from './MenuBoard';
-import Test from './test';
-import './Background.css';
+import './styles/Background.css';
 
 function App() {
 
@@ -23,7 +21,7 @@ function App() {
       <Routes>
           <Route exact path = "/" element={<Home/>} />
           <Route path='/Employee' element={<Employee/>} />
-          <Route path='/Manager_login' element={<Manager_login/>} />
+          <Route path='/login' element={<login/>} />
           <Route path='/Manager' element={<Manager/>} />
           <Route path='/Manager/UpdatePrice' element={<UpdatePrice/>} />
           <Route path='/Manager/Restock' element={<Restock/>} />

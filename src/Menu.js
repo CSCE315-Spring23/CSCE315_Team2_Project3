@@ -11,6 +11,8 @@ export default function Menu() {
 
     let component;
 
+    console.log(component);
+
     switch(window.location.pathname) {
 
         case "/MenuBoard/FeelEnergized":
@@ -35,6 +37,10 @@ export default function Menu() {
 
         case "/MenuBoard/EnjoyTreat":
           component = <EnjoyTreat/>
+          break
+
+        default:
+          component = <FeelEnergized/>
           break
     }
 

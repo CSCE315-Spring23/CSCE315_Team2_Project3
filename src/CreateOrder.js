@@ -1,5 +1,6 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
+import { useState } from 'react';
 import Header from './Header';
 import QuantityCounter from './QuantityCounter';
 //import arrays from another file
@@ -44,6 +45,9 @@ export default function CreateOrder() {
 
   }, [ ])
 
+  console.log(quantity);
+  console.log(selectedTab);
+
   const navigateToCustomize = () => {
     navigate('/Customize');
   };
@@ -76,7 +80,7 @@ export default function CreateOrder() {
   const newQuantity = (newSelectedButton) => {
     setQuantity(newSelectedButton);
   };
-  
+
   return (
     <>
       <Header pageTitle="Create Order"
