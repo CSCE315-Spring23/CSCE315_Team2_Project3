@@ -12,6 +12,8 @@ import Reports from './Reports';
 import Customer from './Customer';
 import Checkout from './Checkout';
 import MenuBoard from './MenuBoard';
+import LoginButton from './LoginButton';
+import LogoutButton from './LogoutButton';
 import './Background.css';
 
 function App() {

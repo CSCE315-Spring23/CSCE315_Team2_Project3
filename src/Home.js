@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import LoginButton from "./LoginButton";
+import LogoutButton from "./LogoutButton";
+import Profile from "./Profile";
 
 export default function Home() {
   const managerEmails = ["carlos_casellas@tamu.edu"];
@@ -12,6 +15,7 @@ export default function Home() {
     // navigate to /contacts
     navigate("/Employee");
   };
+
   const navigateToManager = () => {
     // 👇️ navigate to /Manager
     navigate("/Manager");
@@ -26,8 +30,12 @@ export default function Home() {
     navigate("/MenuBoard/FeelEnergized");
   };
 
-  const [data, setData] = useState({});
-  const [location, setLocation] = useState("");
+  // const navigateToLogin = () => {
+  //   navigate("/LoginButton");
+  // };
+
+  // const [data, setData] = useState({});
+  // const [location, setLocation] = useState("");
   const [weatherLoaded, setWeatherLoaded] = useState(false);
   const [weatherInfo, setWeatherInfo] = useState({});
 
@@ -63,14 +71,29 @@ export default function Home() {
               <p>High Today: {weatherInfo.main.temp_max} ºF</p>
             </div>
           )}
+
+
+
         </header>
         <div className="manager-buttons">
+          {/* <button onClick={navigateToLogin}>Login</button> */}
+          <div>
+            <LoginButton />
+          </div>
           <button onClick={navigateToManager}>Manager</button>
           <button onClick={navigateToEmployee}>Employee</button>
           <button onClick={navigateToCustomer}>Customer</button>
           <button onClick={navigateToMenuBoard}>Menu</button>
           {/* /*  <div>{data.main ? <h1>{Math.ceil(data.main.temp)}</h1> : null}</div> */}
+          <div top = "70px">
+            <LogoutButton />
+          </div>
+          <div>
+            <Profile />
+          </div>
+          
         </div>
+
       </div>
     </>
   );
