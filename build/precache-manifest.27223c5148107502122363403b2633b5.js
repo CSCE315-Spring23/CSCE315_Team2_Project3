@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "b6cc18bdc5a636f54451",
-    "url": "/static/css/main.c190f155.chunk.css"
+    "revision": "dd5fbf99121b613178ef",
+    "url": "/static/css/main.76adc82b.chunk.css"
   },
   {
-    "revision": "b6cc18bdc5a636f54451",
-    "url": "/static/js/main.145248c9.chunk.js"
+    "revision": "dd5fbf99121b613178ef",
+    "url": "/static/js/main.dcbe8680.chunk.js"
   },
   {
     "revision": "42ac5946195a7306e2a5",
@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/static/media/GothamRounded-BoldItalic.1f81b501.otf"
   },
   {
-    "revision": "3d9ee5a5bb7325c50e0c490c3c6924fa",
+    "revision": "43d0c3f3a41ff7b654aecd37aa6e8a3d",
     "url": "/index.html"
   }
 ];

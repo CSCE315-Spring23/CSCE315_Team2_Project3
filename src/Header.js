@@ -22,7 +22,7 @@ export default function Header(props) {
       <h1>{date}</h1>
       <div className="basic-head">
         <img
-          src={require("./images/smoothie_king_logo.png")}
+          src={require("./styles/images/smoothie_king_logo.png")}
           alt={"logo"}
         ></img>
         <p>OrderID: {orderID}</p>
