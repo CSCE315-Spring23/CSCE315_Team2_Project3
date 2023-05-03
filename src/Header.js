@@ -2,7 +2,6 @@ import React from "react";
 import "./styles/Header.css";
 import { orderID, employee } from "./temp_helper";
 var title = "title";
-var orderID = 0;
 
 export default function Header(props) {
   title = props.pageTitle;

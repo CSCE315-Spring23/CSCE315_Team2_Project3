@@ -1,13 +1,12 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import Header from './Header';
 import QuantityCounter from './QuantityCounter';
 //import arrays from another file
-import { titles, contents, sizeTit, sizeCont } from './temp_helper.js';
+import { contents, sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
 import './styles/OrderStyle.css';
-import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function CreateOrder() {
@@ -19,6 +18,8 @@ export default function CreateOrder() {
   const [orderID, setOrderID] = useState(0);
   const [title_list, setList] = useState([]);
   const [content_list, setContent] = useState([[]]);
+
+  console.log(content_list);
 
   useEffect(() => {
     axios.get('http://localhost:3000/max-order-id').then((response) => {

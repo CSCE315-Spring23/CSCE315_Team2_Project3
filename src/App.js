@@ -30,7 +30,6 @@ function App() {
           <Route path='/CreateOrder' element={<CreateOrder/>} />
           <Route path='/Checkout' element={<Checkout/>} />
           <Route path='/Customize' element={<Customize/>} />
-          <Route path='/Test' element={<Test/>} />
           <Route path='/MenuBoard/GetFit' element={<MenuBoard/>} />
           <Route path='/MenuBoard/BeWell' element={<MenuBoard/>} />
           <Route path='/MenuBoard/KidsMenu' element={<MenuBoard/>} />
