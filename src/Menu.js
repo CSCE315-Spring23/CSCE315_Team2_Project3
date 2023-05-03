@@ -11,6 +11,8 @@ export default function Menu() {
 
     let component;
 
+    console.log(component);
+
     switch(window.location.pathname) {
 
         case "/MenuBoard/FeelEnergized":

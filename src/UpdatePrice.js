@@ -13,6 +13,7 @@ export default function UpdatePrice() {
   return (
     <>
       <div className="manager-container">
+        <div className="logo"></div>
         <header className='manager-header'>
           <h1 className='manager-title'>Update Price Dashboard</h1>
         </header>

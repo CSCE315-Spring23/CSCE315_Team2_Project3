@@ -1,14 +1,13 @@
 {
-  "main.css": "/static/css/main.fe98124d.chunk.css",
-  "main.js": "/static/js/main.5588eeaf.chunk.js",
-  "main.js.map": "/static/js/main.5588eeaf.chunk.js.map",
+  "main.css": "/static/css/main.9bf4b23a.chunk.css",
+  "main.js": "/static/js/main.a01f3e8d.chunk.js",
+  "main.js.map": "/static/js/main.a01f3e8d.chunk.js.map",
   "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
   "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
   "static/js/2.1ccd7c83.chunk.js": "/static/js/2.1ccd7c83.chunk.js",
   "static/js/2.1ccd7c83.chunk.js.map": "/static/js/2.1ccd7c83.chunk.js.map",
   "index.html": "/index.html",
-  "precache-manifest.8d0202e873d18ccdc8fbf071548ab573.js": "/precache-manifest.8d0202e873d18ccdc8fbf071548ab573.js",
+  "precache-manifest.754918c8167595b23e522d07dfa3553f.js": "/precache-manifest.754918c8167595b23e522d07dfa3553f.js",
   "service-worker.js": "/service-worker.js",
-  "static/css/main.fe98124d.chunk.css.map": "/static/css/main.fe98124d.chunk.css.map",
-  "static/media/Background.css": "/static/media/GothamRounded-BoldItalic.1f81b501.otf"
+  "static/css/main.9bf4b23a.chunk.css.map": "/static/css/main.9bf4b23a.chunk.css.map"
 }
