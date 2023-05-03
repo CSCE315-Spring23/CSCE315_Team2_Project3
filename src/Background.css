@@ -1,49 +1,76 @@
 .manager-container {
-    background-color: #a93439;
-    color: #fff;
-    min-height: 100vh;
-  }
-  
-  .manager-header {
-    background-color: #d13239;
-    padding: 3rem;
-  }
-  
-  .manager-title {
-    margin: 1rem;
-  }
-  
-  .manager-buttons {
-    text-align: center;
-    padding: 1rem;
-  }
-  
-  .manager-buttons button {
-    background-color: #fff;
-    color: #a93439;
-    border: none;
-    padding: 1rem 2rem;
-    margin-right: 1rem;
-    cursor: pointer;
-  }
-  
-  .manager-buttons button:last-child {
-    margin-right: 0;
-  }
-  
-  .logo {
-    background-image: url('smoothie_king_logo.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    width: 250px;
-    height: 140px;
-    position: absolute;
-    top: 15px;
-    left: 15px;
-  }
-  .weather {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-  
+  background-color: #a93439;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.manager-header {
+  background-color: #d13239;
+  padding: 3rem;
+}
+
+.manager-title {
+  font-family: 'Gotham Rounded Bold Italic', sans-serif;
+  margin: 1rem;
+}
+
+.manager-buttons {
+  text-align: center;
+  padding: 1rem;
+}
+
+.manager-buttons button {
+  font-family: 'Gotham Rounded Bold Italic', sans-serif;
+  background-color: #fff;
+  color: #a93439;
+  border: none;
+  padding: 1rem 2rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.manager-buttons button:hover {
+  background-color: #5f2326;
+  color: #fff;
+}
+
+.manager-buttons button:last-child {
+  margin-right: 0;
+}
+
+.logo {
+  background-image: url("smoothie_king_logo.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 250px;
+  height: 140px;
+  position: absolute;
+  top: 8px;
+  left: 10px;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.search-container input {
+  margin-right: 10px;
+}
+
+@font-face {
+  font-family: 'Gotham Rounded Bold Italic';
+  src: url('GothamRounded-BoldItalic.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+.weather {
+  font-family: 'Gotham Rounded Bold Italic', sans-serif; 
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
