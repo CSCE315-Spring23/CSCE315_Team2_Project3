@@ -38,6 +38,10 @@ export default function Menu() {
         case "/MenuBoard/EnjoyTreat":
           component = <EnjoyTreat/>
           break
+
+        default:
+          component = <FeelEnergized/>
+          break
     }
 
   return (
