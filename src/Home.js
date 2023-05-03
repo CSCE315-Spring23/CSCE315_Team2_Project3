@@ -73,18 +73,20 @@ export default function Home() {
           )}
         </header>
         <div className="manager-buttons">
-          <div>
-            <LoginButton className="login" />
+          <div className="login" >
+            <LoginButton />
+            
           </div>
           <button onClick={navigateToManager}>Manager</button>
           <button onClick={navigateToEmployee}>Employee</button>
           <button onClick={navigateToCustomer}>Customer</button>
           <button onClick={navigateToMenuBoard}>Menu</button>
-          <div top="70px">
-            <LogoutButton className="logout" />
+          <div className="logout">
+            <LogoutButton />
           </div>
-          <div>
-            <Profile className="profile" />
+
+          <div className="profile">
+            <Profile />
           </div>
         </div>
       </div>
