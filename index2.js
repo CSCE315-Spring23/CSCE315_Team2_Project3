@@ -266,30 +266,147 @@ app.get('/inventory', (req, res) => {
     });
 });
 
-app.get('/restockReport', (req, res) => {
-  const selectQuery = `SELECT * FROM inventory WHERE quantity < ${max_invent_quant};`;
-  pool.query(selectQuery)
+
+app.get('/restock-report', (req, res) => {
+  pool.query(`SELECT * FROM inventory WHERE quantity < ${max_invent_quant}`)
     .then(rs => {
       const restockList = [];
       restockList.push(`Fill level for each item is below ${max_invent_quant}. Please restock the following items:`);
       let count = 1;
-  
-      while (rs.rows.length > 0) {
-        const itemName = rs.rows[0][0];
-        const itemQuant = rs.rows[0][1];
-        const item = `${count}. ${itemName}: ---> Current Amount: ${itemQuant}, --- amount needed: ${max_invent_quant - parseInt(itemQuant)}`;
-        restockList.push(item);
+
+      for (const item of rs.rows) {
+        const itemName = item.ingredient;
+        const itemQuant = item.quantity;
+        const itemDiff = max_invent_quant - itemQuant;
+        const itemInfo = `${count}. ${itemName}: ---> Current Amount: ${itemQuant}, --- amount needed: ${itemDiff}`;
+        restockList.push(itemInfo);
         count++;
-        rs.rows.shift();
       }
 
-      res.send(200).json(restockList);
+      if (count === 1) {
+        restockList.push('No items need to be restocked.');
+      }
+
+      const updatePromises = rs.rows.map((item) => {
+        const updateQuery = `UPDATE inventory SET quantity = ${max_invent_quant} WHERE ingredient = '${item.ingredient}'`;
+        return pool.query(updateQuery);
+      });
+
+      return Promise.all(updatePromises)
+        .then(() => res.status(200).json(restockList))
+        .catch((err) => {
+          console.error(err);
+          res.status(500).send('An error occurred while updating the inventory.');
+        });
     })
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({ error: 'Error retrieving restock report' });
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Error retrieving restock report');
     });
 });
+
+/*
+app.get('/excessReport/:start/:end', async (req, res) => {
+  const { start, end } = req.params;
+  let excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
+
+  try {
+    const ingredients = await getIngredientList();
+    const smoothies = await getSmoothieList();
+    console.log(smoothies);
+
+    // set default counts
+    const dictionary = {};
+    for (const key of ingredients) {
+      dictionary[key] = 0;
+    }
+
+    // for every smoothie, get count from orders and check if under 10
+    for (const smoothie of smoothies) {
+      const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothie}')`;
+      const itemsToCount = await getIngredients(smoothie);
+      console.log(itemsToCount);
+      const result = await pool.query(sqlStatement);
+      //const quantitySold = result.rows[0].count;
+      const quantitySold = result.rows[0]['COUNT(*)'];
+
+      for (const item of itemsToCount) {
+        dictionary[item] += quantitySold;
+      }
+    }
+
+    for (const key in dictionary) {
+      const percentageSold = dictionary[key] / getIngredients(key);
+      //console.log("Hello, world! 3");
+      if (percentageSold < 0.1) {
+        excess += `${key} - ${percentageSold.toFixed(2) * 100}%\n`;
+      }
+    }
+
+    res.status(200).json({ excess });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+*/
+app.get('/excessReport/:start/:end', async(req, res) => {
+  const { start, end } = req.params;
+
+  const excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
+  try {
+    const ingredients = await getIngredientList();
+    const smoothies = await getSmoothieList();
+    console.log(smoothies);
+
+    // set default counts
+    const dictionary = {};
+    for (const key of ingredients) {
+      dictionary[key] = 0;
+    }
+
+    const promises = smoothies.map((smoothie) => {
+      const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothie}');`;
+
+      return getIngredients(smoothie)
+        .then((itemsToCount) => {
+          return pool.query(sqlStatement)
+            .then((result) => {
+              const quantitySold = result.rows[0].count;
+
+              for (const item of itemsToCount) {
+                dictionary[item] += quantitySold;
+              }
+            });
+        });
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        // check if under 10
+        const keys = Object.keys(dictionary);
+        let excessItems = '';
+        for (const key of keys) {
+          if (dictionary[key] < 10) {
+            excessItems += `\t${key}\tsold: ${dictionary[key]}\n`;
+          }
+        }
+
+        const data = excess + excessItems;
+        res.status(200).json(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send('An error occurred');
+      });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('An error occurred');
+  }
+});
+
+
+
 
 
 
@@ -318,7 +435,7 @@ let conn = null;
 let stmt;
 let ZReport = "";
 let prevDate = "";
-let max_invent_quant;
+let max_invent_quant = 200;
 //1 -> DONE
 //helper to add item to order
 
@@ -445,6 +562,7 @@ async function sendQuery(sqlStatement) {
 
 //5 -> DONE
 // helper that returns an ArrayList of all smoothie names
+/*
 async function getSmoothieList() {
   const smoothies = [];
   try {
@@ -456,6 +574,20 @@ async function getSmoothieList() {
   }
   return smoothies;
 }
+*/
+async function getSmoothieList() {
+  const smoothies = [];
+  try {
+    const sqlStatement = 'SELECT DISTINCT smoothie_name FROM menu';
+    const result = await pool.query(sqlStatement);
+    result.rows.forEach(row => smoothies.push(row.smoothie_name));
+  } catch (e) {
+    console.error(e);
+  }
+  return smoothies;
+}
+
+
 
 async function sendQuery(sqlStatement) {
   const client = await pool.connect();
@@ -469,11 +601,26 @@ async function sendQuery(sqlStatement) {
 
 //6 -> DONE
 // helper returnss list of ingredients
+/*
 async function getIngredientList() {
   const items = [];
   try {
     const sqlStatement = 'SELECT DISTINCT ingredient FROM menu';
+    //const result = await sendQuery(sqlStatement);
     const result = await sendQuery(sqlStatement);
+    result.rows.forEach(row => items.push(row.ingredient));
+  } catch (e) {
+    console.error(e);
+  }
+  return items;
+}
+*/
+
+async function getIngredientList() {
+  const items = [];
+  try {
+    const sqlStatement = 'SELECT DISTINCT ingredient FROM menu';
+    const result = await pool.query(sqlStatement);
     result.rows.forEach(row => items.push(row.ingredient));
   } catch (e) {
     console.error(e);
@@ -514,8 +661,9 @@ async function excessReport(start, end) {
       const itemsToCount = await getIngredients(smoothie);
 
       const result = await pool.query(sqlStatement);
-
-      const quantitySold = result[0][0]['COUNT(*)'];
+      //console.log(result);
+      //const quantitySold = result[0][0]['COUNT(*)'];
+      const quantitySold = result.rows[0].count;
 
       for (const item of itemsToCount) {
         dictionary[item] += quantitySold;
@@ -561,7 +709,7 @@ async function salesReport(start, end, smoothieName) {
 
 
 
-//excessReport("2020-01-01", "2020-10-20");
+excessReport("2020-02-23", "2020-10-20");
 
 //10 - TO DO
 async function XReport(id) {
