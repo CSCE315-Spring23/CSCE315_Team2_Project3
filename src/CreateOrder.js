@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function CreateOrder() {
+  const [added, setAdded] = useState(false);
   const navigate = useNavigate();
   const [smoothieSelect, setSmoothie] = useState('');
   const [sizeSelect, setSize] = useState('');
@@ -49,25 +50,20 @@ export default function CreateOrder() {
   }, []);
 
   const navigateToCustomize = () => {
-    navigate('/Customize');
+    navigate(`/Customize/${smoothieSelect}`, {state: {smoothieSelect}})
   };
   const navigateToCheckout = () => {
     navigate('/Checkout');
   };
   
-  const addToOrder = async () => {    
-    fetch('http://localhost:3000/max-order-id')
-      .then(response => response.json())
-      .then(data => {
-        // Do something with the data, like display it on the page
-        console.log(data);
-        setOrderID(data);
-      })
-      .catch(error => console.error(error));
+  const addToOrder = async () => {
+    const current = new Date();
+    const date = `${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()}`;
+    const url = 'http://localhost:3000/handle-order/'+orderID+'/'+smoothieSelect+'/'+sizeSelect+'/'+date;
+    axios.get(url);
+    setAdded(true);
   };
 
-  
-  
   const getTab = (newSelectedButton) => {
     setSelectedTab(newSelectedButton);
   };
@@ -119,9 +115,9 @@ export default function CreateOrder() {
         )}
       </div>
 
-      <button className="bottom-buttons" onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Customize</button>
+      <button className="bottom-buttons" onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1 || added==false}>Customize</button>
       <button className="bottom-buttons" onClick={addToOrder} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Add To Order</button>
-      <button className="bottom-buttons" onClick={navigateToCheckout} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Checkout</button>
+      <button className="bottom-buttons" onClick={navigateToCheckout} >Checkout</button>
     </>
   )
 }

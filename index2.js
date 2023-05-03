@@ -65,6 +65,23 @@ app.get('/blend-list', (req, res) => {
     });
 });
 
+app.get('/type-list', (req, res) => {
+  console.log(pool);
+  pool
+    .query('SELECT DISTINCT type FROM inventory2;')
+    .then(result => {
+      const types = [];
+      result.rows.forEach(row => types.push(row.type));
+      const data = {types};
+      console.log(data);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
 app.get('/smoothie-list', (req, res) => {
   console.log(pool);
   pool
@@ -79,6 +96,65 @@ app.get('/smoothie-list', (req, res) => {
     .catch(error => {
       console.log(error);
       res.status(500).send('Internal Server Error');
+    });
+});
+
+app.get('/excessReport/:start/:end', (req, res) => {
+  const start = req.params.start;
+  const end = req.params.end;
+
+  let excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
+  const ingredientsPromise = pool.query('SELECT * FROM ingredients');
+  const smoothiesPromise = pool.query('SELECT * FROM smoothies');
+
+  Promise.all([ingredientsPromise, smoothiesPromise])
+    .then(([ingredientsResult, smoothiesResult]) => {
+      const ingredients = ingredientsResult.rows.map(row => row.name);
+      const smoothies = smoothiesResult.rows.map(row => row.name);
+
+      //set default counts
+      const dictionary = {};
+      for (const key of ingredients) {
+        dictionary[key] = 0;
+      }
+
+      // for every smoothie, get count from orders and check if under 10
+      const smoothiePromises = smoothies.map(smoothie => {
+        const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothie}')`;
+        const itemsToCountPromise = pool.query(`SELECT * FROM smoothie_ingredients WHERE smoothie='${smoothie}'`);
+
+        return Promise.all([itemsToCountPromise, pool.query(sqlStatement)])
+          .then(([itemsResult, quantityResult]) => {
+            const itemsToCount = itemsResult.rows.map(row => row.ingredient_name);
+            const quantitySold = quantityResult.rows[0].count;
+
+            for (const item of itemsToCount) {
+              dictionary[item] += quantitySold;
+            }
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      });
+
+      Promise.all(smoothiePromises)
+        .then(() => {
+          for (const key in dictionary) {
+            const value = dictionary[key];
+            if (value < 10) {
+              excess += `\t${key}\tsold: ${value}\n`;
+            }
+          }
+          res.status(200).json(excess);
+        })
+        .catch(error => {
+          console.error(error);
+          res.status(500).json({ error: 'Internal server error' });
+        });
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
     });
 });
 
@@ -107,6 +183,23 @@ app.get('/smoothies-in-blend/:blend', (req, res) => {
       const smoothies = [];
       result.rows.forEach(row => smoothies.push(row.smoothie_name));
       const data = {smoothies};
+      console.log(data);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+app.get('/ings-in-type/:type', (req, res) => {
+  const type = req.params.type;
+  pool
+    .query('SELECT DISTINCT ingredient FROM inventory2 WHERE type = \'' + type +'\';')
+    .then(result => {
+      const ings = [];
+      result.rows.forEach(row => ings.push(row.ingredient));
+      const data = {ings};
       console.log(data);
       res.status(200).json(data);
     })
@@ -148,6 +241,44 @@ app.get('/item-price/:smoothie', (req, res) => {
     .catch(error => {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+app.get('/order/:order_id', function(req, res) {
+  const order_id = req.params.order_id;
+
+  const query = `SELECT * FROM smoothie_order WHERE order_id = '${order_id}'`;
+  pool.query(query)
+    .then(result => {
+      let order_info = "";
+      let row = result.rows[0];
+
+      while (row) {
+        order_info += "Smoothie: " + row[1];
+        order_info += "\tSize: " + row[2];
+
+        const add = row[4];
+        const rem = row[5];
+
+        if (add != null) {
+          order_info += "\n\tAdd: " + add;
+        }
+
+        if (rem != null) {
+          order_info += "\n\tRemove: " + rem;
+        }
+
+        order_info += "\n\t$" + row[6];
+        order_info += "\n\n";
+
+        row = result.rows.shift();
+      }
+
+      res.send(200).json(order_info);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send('Error getting order');
     });
 });
 
@@ -225,7 +356,73 @@ app.get('/prices/:name/:newPrice', (req, res) => {
     });
 });
 
+app.get('/handle-inventory/:smoothieList/:sizeList', async (req, res) => {
+  try {
+    const smoothieList = req.params.smoothieList.split(',');
+    const sizeList = req.params.sizeList.split(',');
+    const smoothie = smoothieList[0];
+    const ingredientsResponse = await pool.query(`SELECT DISTINCT ingredient FROM menu WHERE smoothie_name = '${smoothie}'`);
+    const ingredients = ingredientsResponse.rows.map(row => row.ingredient);
 
+    for (const item of ingredients) {
+      const sqlStatement = `UPDATE inventory SET quantity = quantity - 1 WHERE ingredient = '${item}'`;
+      console.log(sqlStatement);
+      await pool.query(sqlStatement);
+    }
+
+    res.status(200).json({ message: 'Inventory updated successfully' });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Error updating inventory' });
+  }
+});
+
+app.get('/inventory', (req, res) => {
+  const selectQuery = 'SELECT * FROM inventory';
+  pool.query(selectQuery)
+    .then((result) => {
+      const inventoryList = [];
+      let count = 1;
+      inventoryList.push('Inventory:');
+      result.rows.forEach((row) => {
+        const itemName = row.ingredient;
+        const itemQuant = row.quantity;
+        const item = `${itemName}: ---> Current Amount: ${itemQuant}`;
+        inventoryList.push(`${count}. ${item}`);
+        count++;
+      });
+      res.status(200).json(inventoryList);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error retrieving inventory');
+    });
+});
+
+app.get('/restockReport', (req, res) => {
+  const selectQuery = `SELECT * FROM inventory WHERE quantity < ${max_invent_quant};`;
+  pool.query(selectQuery)
+    .then(rs => {
+      const restockList = [];
+      restockList.push(`Fill level for each item is below ${max_invent_quant}. Please restock the following items:`);
+      let count = 1;
+  
+      while (rs.rows.length > 0) {
+        const itemName = rs.rows[0][0];
+        const itemQuant = rs.rows[0][1];
+        const item = `${count}. ${itemName}: ---> Current Amount: ${itemQuant}, --- amount needed: ${max_invent_quant - parseInt(itemQuant)}`;
+        restockList.push(item);
+        count++;
+        rs.rows.shift();
+      }
+
+      res.send(200).json(restockList);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Error retrieving restock report' });
+    });
+});
 
 app.get('/salesReport/:start/:end/:smoothieName', (req, res) => {
   const { start, end, smoothieName } = req.params;
@@ -249,47 +446,23 @@ app.get('/salesReport/:start/:end/:smoothieName', (req, res) => {
     });
 });
 
-app.get('/handleOrder/:orderID/:smoothieList/:sizeList/:date', (req, res) => {
-  const { orderID, smoothieList, sizeList, date } = req.params;
+app.get('/handle-order/:newOrder/:smoothieList/:sizeList/:date', (req, res) => {
+  const smoothieList = req.params.smoothieList.split(',');
+  const sizeList = req.params.sizeList.split(',');
+  const newOrder = req.params.newOrder;
+  const date = req.params.date;
+  handleOrder(newOrder, smoothieList, sizeList, date);
+});
 
-  const smoothies = smoothieList.split(',');
-  const sizes = sizeList.split(',');
+app.get('/process-new-item/:ingredients/:name', (req, res) => {
+  const ingredients = req.params.ingredients;
+  const name = req.params.name;
+  processNewItem(name, ingredients);
+});
 
-  for (let i = 0; i < smoothies.length; i++) {
-    let price = '/item-price/' + smoothies[i];
-    let size = sizes[i];
-
-    // Adjust price based on size
-    switch (size) {
-      case "12":
-        price *= 0.75;
-        break;
-      case "20":
-        break;
-      case "32":
-        price *= 1.25;
-        break;
-      case "40":
-        price *= 1.5;
-        break;
-      default:
-        break;
-    }
-
-    const sqlStatement = `INSERT INTO smoothie_order (order_id, smoothie_array, smoothie_sizes_array, date, price) VALUES ('${orderID}', '${smoothies[i]}', '${sizes[i]}', '${date}', ${price})`;
-    console.log(sqlStatement);
-
-    pool.query(sqlStatement)
-      .then(() => {
-        handleInventory(smoothies, sizes);
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
-      });
-  }
-
-  res.status(200).json({ message: 'Order successfully handled' });
+app.get('/handle-customizations/:addOns/:removeList/:id/:name', (req, res) => {
+  const {addOns, removeList, id, name} = req.params;
+  handleCustomizations(addOns, removeList, id, name);
 });
 
 app.listen(port, () => 
@@ -324,9 +497,9 @@ let max_invent_quant;
 /*
 /:param1/:param2
 */
-function handleOrder(newOrder, smoothieList, sizeList, date) {
+async function handleOrder(newOrder, smoothieList, sizeList, date) {
   for (let i = 0; i < smoothieList.length; i++) {
-    let price = getItemPrice(smoothieList[i]);
+    let price = await getItemPrice(smoothieList[i]);
     let size = sizeList[i];
 
     // Adjust price based on size
@@ -346,9 +519,9 @@ function handleOrder(newOrder, smoothieList, sizeList, date) {
         break;
     }
 
-    const sqlStatement = `INSERT INTO smoothie_order (order_id, smoothie_array, smoothie_sizes_array, date, price) VALUES ('${newOrder.orderID}', '${smoothieList[i]}', '${sizeList[i]}', '${date}', ${price});`;
+    const sqlStatement = `INSERT INTO smoothie_order (order_id, smoothie_array, smoothie_sizes_array, date, price) VALUES ('${newOrder}', '${smoothieList[i]}', '${sizeList[i]}', '${date}', ${price});`;
     console.log(sqlStatement);
-    sendQuery(sqlStatement);
+    const result = await pool.query(sqlStatement);
     handleInventory(smoothieList, sizeList);
 
     // const check_fillable_query = `SELECT ingredient FROM inventory WHERE ingredient IN (SELECT ingredient FROM menu WHERE smoothie_name = '${smoothieList[i]}') AND quantity = 0;`;
