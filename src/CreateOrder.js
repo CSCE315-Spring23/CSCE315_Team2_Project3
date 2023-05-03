@@ -14,6 +14,9 @@ export default function CreateOrder() {
   const [quantity, setQuantity] = useState('');
   const [selectedTab, setSelectedTab] = useState('');
 
+  console.log(quantity);
+  console.log(selectedTab);
+
   const navigateToCustomize = () => {
     navigate('/Customize');
   };
