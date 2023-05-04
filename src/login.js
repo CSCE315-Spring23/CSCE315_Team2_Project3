@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Manager_login = () => {
+const login = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
 
@@ -30,4 +30,4 @@ const Manager_login = () => {
   );
 };
 
-export default Manager_login;
+export default login;

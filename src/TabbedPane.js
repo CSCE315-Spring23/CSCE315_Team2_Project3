@@ -21,9 +21,9 @@ export default function TabbedPane(props) {
     props.onSelectedTabChange(titles[index]);
   };
 
-  const getMatchingButtonIndex = (contents, buttonText) => {
-    return contents.findIndex((item) => item === buttonText);
-  };
+  // const getMatchingButtonIndex = (contents, buttonText) => {
+  //   return contents.findIndex((item) => item === buttonText);
+  // };
 
   const handleButtonClick = (text, tabIndex, buttonIndex) => {
     const newActiveButtons = activeButtons.map((tabButtons, i) =>

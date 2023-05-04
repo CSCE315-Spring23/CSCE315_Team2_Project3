@@ -1,6 +1,5 @@
 const express = require('express');
 const { Pool } = require('pg');
-const cors = require('cors');
 const dotenv = require('dotenv').config({ path: './connect.env' });
 // Create express app
 const app = express();
@@ -15,11 +14,6 @@ const pool = new Pool({
   ssl: {rejectUnauthorized: false}
 });
 
-// allow client port
-app.use(cors({
-  origin: 'http://localhost:3001'
-}));
-
 // Add process hook to shutdown pool
 process.on('SIGINT', function() {
   pool.end();
@@ -27,394 +21,22 @@ process.on('SIGINT', function() {
   process.exit(0);
 });
 
-app.get('/max-order-id', (req, res) => { // how to start a function, req=in and res=out
-
-  // you can add parameters by etending the url with /max-order-id/:param1/:param2
-  // params would go here like this:
-  // const param2 = req.params.param2;
-
-  pool
-    .query('SELECT MAX(CAST(order_id AS INTEGER)) FROM smoothie_order;') //sends query
-    .then(result => { // .then is what to do with query result
-      console.log(result.rows[0]['max']); //console.log will display data in the server terminal
-      res.status(200).json(result.rows[0]['max']); // ALWAYS use .status(200).json(...) for sending data
-    })
-
-    // error crap
-    .catch(error => {
-      console.log(error);
-      res.status(500).send('Internal Server Error');
-    });
-});
-
-
-app.get('/blend-list', (req, res) => {
+app.get('/max-order-id', (req, res) => {
   console.log(pool);
   pool
-    .query('SELECT DISTINCT blend_type FROM menu;')
+    .query('SELECT MAX(CAST(order_id AS INTEGER)) FROM smoothie_order;')
     .then(result => {
-      const blends = [];
-      result.rows.forEach(row => blends.push(row.blend_type));
-      const data = {blends};
-      console.log(data);
-      res.status(200).json(data);
+      res.send(result.rows[0]['max']);
     })
     .catch(error => {
       console.log(error);
       res.status(500).send('Internal Server Error');
     });
 });
-
-app.get('/smoothie-list', (req, res) => {
-  console.log(pool);
-  pool
-    .query('SELECT DISTINCT smoothie_name FROM menu;')
-    .then(result => {
-      const smoothies = [];
-      result.rows.forEach(row => smoothies.push(row.smoothie_name));
-      const data = {smoothies};
-      console.log(data);
-      res.status(200).json(data);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).send('Internal Server Error');
-    });
-});
-
-app.get('/get-all-ingredients', (req, res) => {
-  console.log(pool);
-  pool
-    .query('SELECT DISTINCT ingredient FROM menu;')
-    .then(result => {
-      const ingredients = [];
-      result.rows.forEach(row => ingredients.push(row.ingredient));
-      const data = {ingredients};
-      console.log(data);
-      res.status(200).json(data);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).send('Internal Server Error');
-    });
-});
-
-app.get('/smoothies-in-blend/:blend', (req, res) => {
-  const blend = req.params.blend;
-  pool
-    .query('SELECT DISTINCT smoothie_name FROM menu WHERE blend_type = \'' + blend +'\';')
-    .then(result => {
-      const smoothies = [];
-      result.rows.forEach(row => smoothies.push(row.smoothie_name));
-      const data = {smoothies};
-      console.log(data);
-      res.status(200).json(data);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).send('Internal Server Error');
-    });
-});
-
-app.get('/ingredients-in-smoothie/:smoothie', (req, res) => {
-  const smoothie = req.params.smoothie;
-  pool
-    .query('SELECT DISTINCT ingredient FROM menu WHERE smoothie_name = \'' + smoothie +'\';')
-    .then(result => {
-      const ingredients = [];
-      result.rows.forEach(row => ingredients.push(row.ingredient));
-      const data = {ingredients};
-      console.log(data);
-      res.status(200).json(data);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).send('Internal Server Error');
-    });
-});
-
-app.get('/item-price/:smoothie', (req, res) => {
-  const smoothie = req.params.smoothie;
-  const sqlStatement = 'SELECT price FROM prices WHERE smoothie=$1';
-  pool.query(sqlStatement, [smoothie])
-    .then(result => {
-      if (result.rowCount === 0) {
-        res.status(404).json({ error: `No price found for ${smoothie}` });
-      } else {
-        const price = result.rows[0].price;
-        res.status(200).json({ price });
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-app.get('/order-total/:orderID', (req, res) => {
-  const orderID = req.params.orderID;
-  const sqlStatement = 'SELECT price FROM smoothie_order WHERE order_id=$1';
-  pool.query(sqlStatement, [orderID])
-    .then(result => {
-      let total = 0.0;
-      result.rows.forEach(row => {
-        total += row.price;
-      });
-      res.status(200).json({ total });
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-app.get('/check-item-available/:item', (req, res) => {
-  const item = req.params.item;
-  const sqlStatement = 'SELECT quantity FROM inventory WHERE ingredient=$1';
-  pool.query(sqlStatement, [item])
-    .then(result => {
-      if (result.rowCount === 0) {
-        res.status(404).json({ error: `No inventory found for ${item}` });
-      } else if (parseInt(result.rows[0].quantity) <= 0) {
-        res.status(200).json({ available: false });
-      } else {
-        res.status(200).json({ available: true });
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-app.get('/check-smoothie-available/:smoothie_name', (req, res) => {
-  const smoothieName = req.params.smoothie_name;
-  getIngredients(smoothieName)
-    .then(ingredients => {
-      const sqlStatement = 'SELECT quantity FROM inventory WHERE ingredient = ANY($1::text[])';
-      return pool.query(sqlStatement, [ingredients]);
-    })
-    .then(result => {
-      const unavailableItems = result.rows.filter(row => parseInt(row.quantity) <= 0);
-      if (unavailableItems.length > 0) {
-        res.status(200).json({ available: false, unavailable_items: unavailableItems.map(item => item.ingredient) });
-      } else {
-        res.status(200).json({ available: true });
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-app.get('/prices/:name/:newPrice', (req, res) => {
-  const name = req.params.name;
-  const newPrice = req.params.newPrice;
-
-  const sqlStatement = `UPDATE prices SET price = '${newPrice}' WHERE smoothie = '${name}'`;
-
-  pool.query(sqlStatement)
-    .then(() => {
-      console.log(`Price for ${name} has been updated to ${newPrice}`);
-      res.status(200).json({ message: `Price for ${name} has been updated to ${newPrice}` });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-app.get('/handle-inventory/:smoothieList/:sizeList', async (req, res) => {
-  try {
-    const smoothieList = req.params.smoothieList.split(',');
-    const sizeList = req.params.sizeList.split(',');
-    const ingredients = await getIngredients(smoothieList[0]);
-
-    for (const item of ingredients) {
-      const sqlStatement = `UPDATE inventory SET quantity = quantity - 1 WHERE ingredient = '${item}'`;
-      console.log(sqlStatement);
-      await pool.query(sqlStatement);
-    }
-
-    res.status(200).json({ message: 'Inventory updated successfully' });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: 'Error updating inventory' });
-  }
-});
-
-app.get('/inventory', (req, res) => {
-  const selectQuery = 'SELECT * FROM inventory';
-  pool.query(selectQuery)
-    .then((result) => {
-      const inventoryList = [];
-      let count = 1;
-      inventoryList.push('Inventory:');
-      result.rows.forEach((row) => {
-        const itemName = row.ingredient;
-        const itemQuant = row.quantity;
-        const item = `${itemName}: ---> Current Amount: ${itemQuant}`;
-        inventoryList.push(`${count}. ${item}`);
-        count++;
-      });
-      res.status(200).json(inventoryList);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error retrieving inventory');
-    });
-});
-
-
-app.get('/restock-report', (req, res) => {
-  pool.query(`SELECT * FROM inventory WHERE quantity < ${max_invent_quant}`)
-    .then(rs => {
-      const restockList = [];
-      restockList.push(`Fill level for each item is below ${max_invent_quant}. Please restock the following items:`);
-      let count = 1;
-
-      for (const item of rs.rows) {
-        const itemName = item.ingredient;
-        const itemQuant = item.quantity;
-        const itemDiff = max_invent_quant - itemQuant;
-        const itemInfo = `${count}. ${itemName}: ---> Current Amount: ${itemQuant}, --- amount needed: ${itemDiff}`;
-        restockList.push(itemInfo);
-        count++;
-      }
-
-      if (count === 1) {
-        restockList.push('No items need to be restocked.');
-      }
-
-      const updatePromises = rs.rows.map((item) => {
-        const updateQuery = `UPDATE inventory SET quantity = ${max_invent_quant} WHERE ingredient = '${item.ingredient}'`;
-        return pool.query(updateQuery);
-      });
-
-      return Promise.all(updatePromises)
-        .then(() => res.status(200).json(restockList))
-        .catch((err) => {
-          console.error(err);
-          res.status(500).send('An error occurred while updating the inventory.');
-        });
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).send('Error retrieving restock report');
-    });
-});
-
-/*
-app.get('/excessReport/:start/:end', async (req, res) => {
-  const { start, end } = req.params;
-  let excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
-
-  try {
-    const ingredients = await getIngredientList();
-    const smoothies = await getSmoothieList();
-    console.log(smoothies);
-
-    // set default counts
-    const dictionary = {};
-    for (const key of ingredients) {
-      dictionary[key] = 0;
-    }
-
-    // for every smoothie, get count from orders and check if under 10
-    for (const smoothie of smoothies) {
-      const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothie}')`;
-      const itemsToCount = await getIngredients(smoothie);
-      console.log(itemsToCount);
-      const result = await pool.query(sqlStatement);
-      //const quantitySold = result.rows[0].count;
-      const quantitySold = result.rows[0]['COUNT(*)'];
-
-      for (const item of itemsToCount) {
-        dictionary[item] += quantitySold;
-      }
-    }
-
-    for (const key in dictionary) {
-      const percentageSold = dictionary[key] / getIngredients(key);
-      //console.log("Hello, world! 3");
-      if (percentageSold < 0.1) {
-        excess += `${key} - ${percentageSold.toFixed(2) * 100}%\n`;
-      }
-    }
-
-    res.status(200).json({ excess });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
-*/
-app.get('/excessReport/:start/:end', async(req, res) => {
-  const { start, end } = req.params;
-
-  const excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
-  try {
-    const ingredients = await getIngredientList();
-    const smoothies = await getSmoothieList();
-    console.log(smoothies);
-
-    // set default counts
-    const dictionary = {};
-    for (const key of ingredients) {
-      dictionary[key] = 0;
-    }
-
-    const promises = smoothies.map((smoothie) => {
-      const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothie}');`;
-
-      return getIngredients(smoothie)
-        .then((itemsToCount) => {
-          return pool.query(sqlStatement)
-            .then((result) => {
-              const quantitySold = result.rows[0].count;
-
-              for (const item of itemsToCount) {
-                dictionary[item] += quantitySold;
-              }
-            });
-        });
-    });
-
-    Promise.all(promises)
-      .then(() => {
-        // check if under 10
-        const keys = Object.keys(dictionary);
-        let excessItems = '';
-        for (const key of keys) {
-          if (dictionary[key] < 10) {
-            excessItems += `\t${key}\tsold: ${dictionary[key]}\n`;
-          }
-        }
-
-        const data = excess + excessItems;
-        res.status(200).json(data);
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send('An error occurred');
-      });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('An error occurred');
-  }
-});
-
-
-
-
-
 
 app.listen(port, () => 
-  console.log('Server running on port',port)
+  console.log(`Server running on port ${port}`)
 );
-
-module.exports = app;
 
 //This is just a example functions
 function updateInventoryQuantity() {
@@ -435,13 +57,9 @@ let conn = null;
 let stmt;
 let ZReport = "";
 let prevDate = "";
-let max_invent_quant = 200;
+let max_invent_quant;
 //1 -> DONE
 //helper to add item to order
-
-/*
-/:param1/:param2
-*/
 function handleOrder(newOrder, smoothieList, sizeList, date) {
   for (let i = 0; i < smoothieList.length; i++) {
     let price = getItemPrice(smoothieList[i]);
@@ -541,28 +159,33 @@ async function processNewItem(name, ingredients) {
   // for each item, check if any are new. Add new to inventory
 }
 
-async function getIngredientList() {
-  const sqlStatement = 'SELECT DISTINCT ingredient FROM inventory';
-  const result = await sendQuery(sqlStatement);
-  const ingredients = result.rows.map(row => row.ingredient);
-  return ingredients;
-}
+// async function getIngredientList() {
+//   const sqlStatement = 'SELECT DISTINCT ingredient FROM inventory';
+//   const result = await sendQuery(sqlStatement);
+//   const ingredients = result.rows.map(row => row.ingredient);
+//   return ingredients;
+// }
 
-async function sendQuery(sqlStatement) {
-  const client = await pool.connect();
-  try {
-    const result = await client.query(sqlStatement);
-    return result;
-  } finally {
-    client.release();
-  }
-}
+// async function sendQuery(sqlStatement) {
+//   try {
+//     const client = await pool.connect();
+//     const result = await client.query(sqlStatement);
+//     client.release();
+//     if (result && result.rows) {
+//       return result;
+//     } else {
+//       throw new Error('Invalid query result');
+//     }
+//   } catch (e) {
+//     console.error(e);
+//     throw e;
+//   }
+// }
 
 
 
 //5 -> DONE
 // helper that returns an ArrayList of all smoothie names
-/*
 async function getSmoothieList() {
   const smoothies = [];
   try {
@@ -574,53 +197,36 @@ async function getSmoothieList() {
   }
   return smoothies;
 }
-*/
-async function getSmoothieList() {
-  const smoothies = [];
+
+async function getBlendList() {
+  const blends = [];
   try {
-    const sqlStatement = 'SELECT DISTINCT smoothie_name FROM menu';
-    const result = await pool.query(sqlStatement);
-    result.rows.forEach(row => smoothies.push(row.smoothie_name));
+    const sqlStatement = 'SELECT DISTINCT blend_type FROM menu';
+    const result = await sendQuery(sqlStatement);
+    result.rows.forEach(row => blends.push(row.blend_type));
   } catch (e) {
     console.error(e);
   }
-  return smoothies;
+  return blends;
 }
 
-
-
-async function sendQuery(sqlStatement) {
-  const client = await pool.connect();
-  try {
-    const result = await client.query(sqlStatement);
-    return result;
-  } finally {
-    client.release();
-  }
-}
+// async function sendQuery(sqlStatement) {
+//   const client = await pool.connect();
+//   try {
+//     const result = await client.query(sqlStatement);
+//     return result;
+//   } finally {
+//     client.release();
+//   }
+// }
 
 //6 -> DONE
 // helper returnss list of ingredients
-/*
 async function getIngredientList() {
   const items = [];
   try {
     const sqlStatement = 'SELECT DISTINCT ingredient FROM menu';
-    //const result = await sendQuery(sqlStatement);
     const result = await sendQuery(sqlStatement);
-    result.rows.forEach(row => items.push(row.ingredient));
-  } catch (e) {
-    console.error(e);
-  }
-  return items;
-}
-*/
-
-async function getIngredientList() {
-  const items = [];
-  try {
-    const sqlStatement = 'SELECT DISTINCT ingredient FROM menu';
-    const result = await pool.query(sqlStatement);
     result.rows.forEach(row => items.push(row.ingredient));
   } catch (e) {
     console.error(e);
@@ -661,9 +267,8 @@ async function excessReport(start, end) {
       const itemsToCount = await getIngredients(smoothie);
 
       const result = await pool.query(sqlStatement);
-      //console.log(result);
-      //const quantitySold = result[0][0]['COUNT(*)'];
-      const quantitySold = result.rows[0].count;
+
+      const quantitySold = result[0][0]['COUNT(*)'];
 
       for (const item of itemsToCount) {
         dictionary[item] += quantitySold;
@@ -709,7 +314,7 @@ async function salesReport(start, end, smoothieName) {
 
 
 
-excessReport("2020-02-23", "2020-10-20");
+//excessReport("2020-01-01", "2020-10-20");
 
 //10 - TO DO
 async function XReport(id) {
@@ -752,8 +357,6 @@ async function XReport(id) {
   console.log(order_info);
   return order_info;
 }
-
-
 
 //11 DONE
 async function getOrder(order_id) {
@@ -933,11 +536,12 @@ getIngredients("caribbean_way")
   //19 -> DONE
   async function sendQuery(sqlStatement) {
     try {
-      await pool.query(sqlStatement);
+      const result = await pool.query(sqlStatement);
+      return result;
     } catch (e) {
-      // console.error(e);
+      console.error(e);
     }
-  }
+  }  
   
   //20 -> DONE
   async function getRestockReport() {
@@ -1014,3 +618,9 @@ getIngredients("caribbean_way")
       console.error(err);
     }
   }
+
+  module.exports = {
+    getID,
+    XReport,
+    app
+  };
