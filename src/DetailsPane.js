@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
 export default function DetailsPane(props) {
+  const index = props.index-1
+  console.log('key',index)
   const [value, setValue] = useState(props.defaultValue);
   const [editing, setEditing] = useState(false);
 
@@ -19,7 +21,7 @@ export default function DetailsPane(props) {
   }
 
   const handleChange = (event) => {
-    setValue(event.target.value.split(","));
+    setValue(event.target.value.split(", "));
   }
 
   return (
@@ -32,12 +34,17 @@ export default function DetailsPane(props) {
         </div>
       ) : (
         <div>
+          Item {index}:
           {value.length > 0 && (
-            <span>
-              {value.join(", ")}
-            </span>
+            <div style={{paddingLeft: "5%"}}>
+              Smoothie: {value[0]}<br/>
+              Size: {value[1]}<br/>
+              Add: {value[2]}<br/>
+              Remove: {value[3]}<br/>
+              Price: {value[4]}
+            </div>
           )}
-          <button onClick={handleEdit}>Edit</button>
+          {/* <button onClick={handleEdit}>Edit</button> */}
           <button onClick={props.onDelete}>Delete</button>
         </div>
       )}

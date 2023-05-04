@@ -47,6 +47,13 @@ app.get('/max-order-id', (req, res) => { // how to start a function, req=in and 
     });
 });
 
+app.get('/order-total/:id', async (req,res) => {
+  const id = req.params.id;
+  const total = await getOrderTotal(id);
+  console.log(total);
+  const data = {total};
+  res.status(200).json(data)
+})
 
 app.get('/blend-list', (req, res) => {
   console.log(pool);
@@ -244,59 +251,36 @@ app.get('/item-price/:smoothie', (req, res) => {
     });
 });
 
-app.get('/order/:order_id', function(req, res) {
+app.get('/remove-item/:id/:smoothie/:addOns/:removes/:size', async (req, res) => {
+  const {id, smoothie, addOns, removes, size} = req.params;
+  const sqlStatement = 
+  'DELETE FROM smoothie_order WHERE ctid IN (SELECT ctid FROM smoothie_order WHERE order_id = \''+id
+  +'\' AND smoothie_array = \''+ smoothie 
+  +'\' AND smoothie_sizes_array = \'' + size
+  +'\' AND custom_add = \'' + addOns
+  +'\' AND custom_remove = \'' + removes
+  + '\' LIMIT 1);';
+  await pool.query(sqlStatement);
+  console.log(sqlStatement);
+  res.status(200).json();
+})
+
+app.get('/order/:order_id', async function(req, res) {
   const order_id = req.params.order_id;
+  const order_items = await getOrder(order_id);
+  order_items.forEach(row => row.shift());
+  order_items.forEach(row => row.splice(2,1));
 
-  const query = `SELECT * FROM smoothie_order WHERE order_id = '${order_id}'`;
-  pool.query(query)
-    .then(result => {
-      let order_info = "";
-      let row = result.rows[0];
+  console.log(order_items)
+  const ret = []
+  for(let i=0; i<order_items.length; i++){
+    const row = order_items[i];
+    row[4] = '$'+row[4];
+    if(row[0] != 'none') ret.push([i+1, row])
+  }
 
-      while (row) {
-        order_info += "Smoothie: " + row[1];
-        order_info += "\tSize: " + row[2];
-
-        const add = row[4];
-        const rem = row[5];
-
-        if (add != null) {
-          order_info += "\n\tAdd: " + add;
-        }
-
-        if (rem != null) {
-          order_info += "\n\tRemove: " + rem;
-        }
-
-        order_info += "\n\t$" + row[6];
-        order_info += "\n\n";
-
-        row = result.rows.shift();
-      }
-
-      res.send(200).json(order_info);
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Error getting order');
-    });
-});
-
-app.get('/order-total/:orderID', (req, res) => {
-  const orderID = req.params.orderID;
-  const sqlStatement = 'SELECT price FROM smoothie_order WHERE order_id=$1';
-  pool.query(sqlStatement, [orderID])
-    .then(result => {
-      let total = 0.0;
-      result.rows.forEach(row => {
-        total += row.price;
-      });
-      res.status(200).json({ total });
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
+  const data = {ret};
+  res.status(200).json(data);
 });
 
 app.get('/check-item-available/:item', (req, res) => {
@@ -452,6 +436,7 @@ app.get('/handle-order/:newOrder/:smoothieList/:sizeList/:date', (req, res) => {
   const newOrder = req.params.newOrder;
   const date = req.params.date;
   handleOrder(newOrder, smoothieList, sizeList, date);
+  res.status(200).json();
 });
 
 app.get('/process-new-item/:ingredients/:name', (req, res) => {
@@ -592,9 +577,10 @@ let max_invent_quant;
 */
 async function handleOrder(newOrder, smoothieList, sizeList, date) {
   for (let i = 0; i < smoothieList.length; i++) {
-    let price = await getItemPrice(smoothieList[i]);
+    let price = 0;
+    if(smoothieList[0] != 'none') price = await getItemPrice(smoothieList[i]);
     let size = sizeList[i];
-
+    console.log('$',price);
     // Adjust price based on size
     switch (size) {
       case "12":
@@ -611,15 +597,18 @@ async function handleOrder(newOrder, smoothieList, sizeList, date) {
       default:
         break;
     }
+    
 
-    const sqlStatement = `INSERT INTO smoothie_order (order_id, smoothie_array, smoothie_sizes_array, date, price) VALUES ('${newOrder}', '${smoothieList[i]}', '${sizeList[i]}', '${date}', ${price});`;
+    const sqlStatement = `INSERT INTO smoothie_order (order_id, smoothie_array, smoothie_sizes_array, date, custom_add, custom_remove, price) VALUES ('${newOrder}', '${smoothieList[i]}', '${sizeList[i]}', '${date}', 'none', 'none', ${price});`;
     console.log(sqlStatement);
     const result = await pool.query(sqlStatement);
-    handleInventory(smoothieList, sizeList);
+    console.log('added order');
+    if(smoothieList[i] != 'none') await handleInventory(smoothieList, sizeList);
 
     // const check_fillable_query = `SELECT ingredient FROM inventory WHERE ingredient IN (SELECT ingredient FROM menu WHERE smoothie_name = '${smoothieList[i]}') AND quantity = 0;`;
     // const update_inventory_query = `UPDATE inventory SET quantity = quantity - 1 WHERE ingredient IN (SELECT ingredient FROM menu WHERE smoothie_name = '${smoothieList[i]}')`;
   }
+  console.log('done');
 }
 
 //2 -> DONE
@@ -629,6 +618,8 @@ async function getItemPrice(smoothie) {
     const sqlStatement = `SELECT price FROM prices WHERE smoothie='${smoothie}';`;
     const result = await pool.query(sqlStatement);
     price = result.rows[0].price;
+    console.log(price);
+    return price;
   } catch (e) {
     console.error(e);
   }
@@ -874,37 +865,16 @@ async function XReport(id) {
 
 //11 DONE
 async function getOrder(order_id) {
-  let order_info = "";
-
   const query = `SELECT * FROM smoothie_order WHERE order_id = '${order_id}'`;
   const result = await pool.query(query);
+  const order_items = [];
+  result.rows.forEach(row => {
+    const order_item = [];
+    Object.keys(row).forEach(key => order_item.push(row[key]));
+    order_items.push(order_item);
+  });
 
-  let row = result.rows[0]; // get the first row
-
-  while (row) {
-    order_info += "Smoothie: " + row[1];
-    order_info += "\tSize: " + row[2];
-
-    const add = row[4];
-    const rem = row[5];
-
-    if (add != null) {
-      order_info += "\n\tAdd: " + add;
-    }
-
-    if (rem != null) {
-      order_info += "\n\tRemove: " + rem;
-    }
-
-    order_info += "\n\t$" + row[6];
-    order_info += "\n\n";
-
-    row = result.rows.shift(); // get the next row
-  }
-
-  pool.end();
-
-  return order_info;
+  return order_items;
 }
 
 //12 -> DONE
@@ -916,16 +886,17 @@ async function handleCustomizations(addOns, removeList, id, name) {
     
     // execute query using pool.query
     await pool.query(sqlStatement);
-
+    const adds = addOns.split(',');
+    const rems = removeList.split(',');
     // decrement each customization in the list
-    for (const item of addOns) {
+    for (const item of adds) {
       const decrementQuery = `UPDATE inventory SET quantity = quantity - 1 WHERE ingredient = '${item}'`;
       console.log(decrementQuery);
       await pool.query(decrementQuery);
     }
 
     // increment each customization in the list
-    for (const item of removeList) {
+    for (const item of rems) {
       const incrementQuery = `UPDATE inventory SET quantity = quantity + 1 WHERE ingredient = '${item}'`;
       console.log(incrementQuery);
       await pool.query(incrementQuery);

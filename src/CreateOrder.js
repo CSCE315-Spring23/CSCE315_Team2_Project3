@@ -56,11 +56,13 @@ export default function CreateOrder() {
     navigate('/Checkout');
   };
   
-  const addToOrder = async () => {
+  const addToOrder = () => {
     const current = new Date();
     const date = `${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()}`;
     const url = 'http://localhost:3000/handle-order/'+orderID+'/'+smoothieSelect+'/'+sizeSelect+'/'+date;
-    axios.get(url);
+    for(let i=-1; i<quantity;i++) {
+      axios.get(url);
+    }
     setAdded(true);
   };
 
@@ -115,7 +117,7 @@ export default function CreateOrder() {
         )}
       </div>
 
-      <button className="bottom-buttons" onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1 || added==false}>Customize</button>
+      <button className="bottom-buttons" onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1 || added===false}>Customize</button>
       <button className="bottom-buttons" onClick={addToOrder} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Add To Order</button>
       <button className="bottom-buttons" onClick={navigateToCheckout} >Checkout</button>
     </>

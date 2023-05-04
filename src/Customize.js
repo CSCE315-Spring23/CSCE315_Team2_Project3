@@ -11,8 +11,8 @@ import axios from 'axios';
 export default function Customize() {
   const { smoothieName } = useParams();
   const navigate = useNavigate();
-  const [selectedAdd, setAdd] = useState('');
-  const [selectedRemove, setRemove] = useState('');
+  const [selectedAdd, setAdd] = useState(['none']);
+  const [selectedRemove, setRemove] = useState(['none']);
   const [selectedTab, setSelectedTab] = useState('');
   const [orderID, setOrderID] = useState(0);
   const [titles_ing, setList] = useState([]);
@@ -75,7 +75,7 @@ export default function Customize() {
   };
 
   const updateOrder = () => {
-    axios.get('http://localhost:3000/handle-customizations/'+selectedAdd+'/'+selectedRemove+'/'+orderID+'/'+smoothieName);
+    axios.get('http://localhost:3000/handle-customizations/'+([selectedAdd])+'/'+([selectedRemove])+'/'+orderID+'/'+smoothieName);
     navigate('/CreateOrder');
   };
 
