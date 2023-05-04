@@ -125,6 +125,7 @@ app.get('/get-all-ingredients', (req, res) => {
 
 app.get('/smoothies-in-blend/:blend', (req, res) => {
   const blend = req.params.blend;
+  console.log(blend);
   pool
     .query('SELECT DISTINCT smoothie_name FROM menu WHERE blend_type = \'' + blend +'\';')
     .then(result => {
