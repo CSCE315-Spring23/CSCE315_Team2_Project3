@@ -5,6 +5,7 @@ import Manager from './Manager';
 import Customize from './Customize';
 import CreateOrder from './CreateOrder';
 import Home from './Home';
+import Test from './test';
 import UpdatePrice from './UpdatePrice';
 import Restock from './Restock';
 import Reports from './Reports';

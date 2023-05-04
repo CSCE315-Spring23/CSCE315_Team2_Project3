@@ -340,6 +340,20 @@ app.get('/prices/:name/:newPrice', (req, res) => {
     });
 });
 
+app.get('/handle-order/:newOrder/:smoothieList/:sizeList/:date', (req, res) => {
+  const smoothieList = req.params.smoothieList.split(',');
+  const sizeList = req.params.sizeList.split(',');
+  const newOrder = req.params.newOrder;
+  const date = req.params.date;
+  handleOrder(newOrder, smoothieList, sizeList, date);
+  res.status(200).json();
+});
+
+app.get('/handle-customizations/:addOns/:removeList/:id/:name', (req, res) => {
+  const {addOns, removeList, id, name} = req.params;
+  handleCustomizations(addOns, removeList, id, name);
+});
+
 app.get('/handle-inventory/:smoothieList/:sizeList', async (req, res) => {
   try {
     const smoothieList = req.params.smoothieList.split(',');
@@ -519,11 +533,6 @@ app.get('/excessReport/:start/:end', async(req, res) => {
     res.status(500).send('An error occurred');
   }
 });
-
-
-
-
-
 
 app.listen(port, () => 
   console.log('Server running on port',port)
@@ -827,10 +836,6 @@ async function salesReport(start, end, smoothieName) {
   console.log(order_info);
   return order_info;
 }
-
-
-
-excessReport("2020-02-23", "2020-10-20");
 
 //10 - TO DO
 async function XReport(id) {

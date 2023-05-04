@@ -1,11 +1,11 @@
 import React from "react";
 import "./styles/Header.css";
-import { orderID, employee } from "./temp_helper";
+import { employee } from "./temp_helper";
 var title = "title";
 
 export default function Header(props) {
   title = props.pageTitle;
-  orderID = props.orderID;
+  const orderID = props.orderID;
 
   const current = new Date();
   const date = `${current.getFullYear()}-${

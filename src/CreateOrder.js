@@ -1,13 +1,13 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import { useState , useEffect } from 'react';
-import Header from './Header';
 import QuantityCounter from './QuantityCounter';
 //import arrays from another file
 import { sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
 import './styles/OrderStyle.css';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Header from './Header';
 
 export default function CreateOrder() {
   const [added, setAdded] = useState(false);
@@ -29,7 +29,7 @@ export default function CreateOrder() {
     const fetchData = async () => {
       const orderResponse = await axios.get('http://localhost:3000/max-order-id');
       setOrderID(orderResponse.data);
-      console.log(orderResponse.data);
+      console.log("id: ",orderResponse.data);
   
       const blendResponse = await axios.get('http://localhost:3000/blend-list');
       const blendsList = blendResponse.data.blends;
@@ -78,7 +78,7 @@ export default function CreateOrder() {
   const newQuantity = (newSelectedButton) => {
     setQuantity(newSelectedButton);
   };
-
+  
   return (
     <>
       <Header pageTitle="Create Order"

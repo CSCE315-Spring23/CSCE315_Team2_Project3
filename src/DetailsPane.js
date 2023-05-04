@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 export default function DetailsPane(props) {
+  const disableDel = props.disableDel
   const index = props.index-1
   console.log('key',index)
   const [value, setValue] = useState(props.defaultValue);
@@ -45,7 +46,7 @@ export default function DetailsPane(props) {
             </div>
           )}
           {/* <button onClick={handleEdit}>Edit</button> */}
-          <button onClick={props.onDelete}>Delete</button>
+          <button onClick={props.onDelete} disabled={disableDel===true}>Delete</button>
         </div>
       )}
     </div>

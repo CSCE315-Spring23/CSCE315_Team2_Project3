@@ -1,9 +1,7 @@
 import React from 'react';
-import { useState } from 'react';
 import Header from './Header';
 import DetailsPane from './DetailsPane';
 import { useState, useEffect } from 'react';
-import { flushSync } from 'react-dom';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
@@ -16,6 +14,7 @@ export default function Checkout() {
   const [price, setPrice] = useState(0);
 
   useEffect(() => {
+    console.log(complete)
     let id=0;
     const getOrder = async () => {
       await axios.get('http://localhost:3000/max-order-id').then((response) => {
@@ -106,6 +105,7 @@ export default function Checkout() {
                 key={key}
                 defaultValue={value}
                 onSave={(newValue) => handleSave(key, newValue)}
+                disableDel={complete}
                 onDelete={() => handleDelete(key)}
                 index={key}
               />
