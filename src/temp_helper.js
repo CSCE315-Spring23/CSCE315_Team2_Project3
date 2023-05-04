@@ -29,3 +29,10 @@ export const sizeCont = [["40","32","20","16"]]
 export const orderID = "69420";
 export const employee = "Biggie Cheese"
 export const smoothieName = "coffee_dlite_mocha";
+export const total = "69"
+
+export const orderItems = [[1,["coffee_dlite_mocha", "40", "ingredient_1", "bananas", "apples"]],
+[2,["angel_food_slim", "32", "ingredient_2", "", "apples"]],
+[3,["coffee_dlite_mocha", "20", "ingredient_3", "bananas", "apples"]],
+[4,["lean1_chocolate", "16", "", "bananas", "apples"]],
+[5,["banana_boat", "40", "ingredient_1", "bananas", "apples"]]]

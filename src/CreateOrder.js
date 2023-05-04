@@ -1,15 +1,16 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import { useState , useEffect } from 'react';
-import Header from './Header';
 import QuantityCounter from './QuantityCounter';
 //import arrays from another file
-import { contents, sizeTit, sizeCont } from './temp_helper.js';
+import { sizeTit, sizeCont } from './temp_helper.js';
 import TabbedPane from './TabbedPane';
 import './styles/OrderStyle.css';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Header from './Header';
 
 export default function CreateOrder() {
+  const [added, setAdded] = useState(false);
   const navigate = useNavigate();
   const [smoothieSelect, setSmoothie] = useState('');
   const [sizeSelect, setSize] = useState('');
@@ -18,57 +19,53 @@ export default function CreateOrder() {
   const [orderID, setOrderID] = useState(0);
   const [title_list, setList] = useState([]);
   const [content_list, setContent] = useState([[]]);
-
-  console.log(content_list);
-
-  useEffect(() => {
-    axios.get('http://localhost:3000/max-order-id').then((response) => {
+  /*
+  axios.get('http://localhost:3000/max-order-id').then((response) => {
       setOrderID(response.data);
       console.log(response.data);
     });
-
-    axios.get('http://localhost:3000/blend-list').then((response) => {
-      const blendsList = response.data.blends;
+  */
+  useEffect(() => {
+    const fetchData = async () => {
+      const orderResponse = await axios.get('http://localhost:3000/max-order-id');
+      setOrderID(orderResponse.data);
+      console.log("id: ",orderResponse.data);
+  
+      const blendResponse = await axios.get('http://localhost:3000/blend-list');
+      const blendsList = blendResponse.data.blends;
       console.log(blendsList);
-      setList(response.data.blends);
-    });
-    
-    const content = [[]]
-    const blend = "enjoy_a_treat";
-    console.log(blend);
-    axios.get('http://localhost:3000/smoothies-in-blend/enjoy_a_treat/').then((response) => {
-      const sml = response.data.smoothies;
-      console.log(sml);
-      content.push(sml);
-    });
-
-    setContent(content);
-
-  }, [ ])
-
-  console.log(quantity);
-  console.log(selectedTab);
+      setList(blendsList);
+  
+      const content = [];
+      for ( let i=0; i<blendsList.length; i++) {
+        const smoothieResponse = await axios.get(`http://localhost:3000/smoothies-in-blend/${blendsList[i]}`);
+        const sml = smoothieResponse.data.smoothies;
+        console.log(sml);
+        content[i] = sml;
+      }
+      setContent(content);
+    };
+  
+    fetchData();
+  }, []);
 
   const navigateToCustomize = () => {
-    navigate('/Customize');
+    navigate(`/Customize/${smoothieSelect}`, {state: {smoothieSelect}})
   };
   const navigateToCheckout = () => {
     navigate('/Checkout');
   };
   
-  const addToOrder = async () => {    
-    fetch('http://localhost:3000/max-order-id')
-      .then(response => response.json())
-      .then(data => {
-        // Do something with the data, like display it on the page
-        console.log(data);
-        setOrderID(data);
-      })
-      .catch(error => console.error(error));
+  const addToOrder = () => {
+    const current = new Date();
+    const date = `${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()}`;
+    const url = 'http://localhost:3000/handle-order/'+orderID+'/'+smoothieSelect+'/'+sizeSelect+'/'+date;
+    for(let i=-1; i<quantity;i++) {
+      axios.get(url);
+    }
+    setAdded(true);
   };
 
-  
-  
   const getTab = (newSelectedButton) => {
     setSelectedTab(newSelectedButton);
   };
@@ -81,7 +78,7 @@ export default function CreateOrder() {
   const newQuantity = (newSelectedButton) => {
     setQuantity(newSelectedButton);
   };
-
+  
   return (
     <>
       <Header pageTitle="Create Order"
@@ -89,7 +86,7 @@ export default function CreateOrder() {
       />
 
       <TabbedPane tabTitles={title_list} 
-        tabContent={contents} 
+        tabContent={content_list} 
         multipleSelections={false}
         onSelectedButtonChange={newSmoothie}
         onSelectedTabChange={getTab}
@@ -120,9 +117,9 @@ export default function CreateOrder() {
         )}
       </div>
 
-      <button className="bottom-buttons" onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Customize</button>
+      <button className="bottom-buttons" onClick={navigateToCustomize} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1 || added===false}>Customize</button>
       <button className="bottom-buttons" onClick={addToOrder} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Add To Order</button>
-      <button className="bottom-buttons" onClick={navigateToCheckout} disabled={smoothieSelect.length < 1 || sizeSelect.length < 1}>Checkout</button>
+      <button className="bottom-buttons" onClick={navigateToCheckout} >Checkout</button>
     </>
   )
 }

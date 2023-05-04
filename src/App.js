@@ -5,6 +5,7 @@ import Manager from './Manager';
 import Customize from './Customize';
 import CreateOrder from './CreateOrder';
 import Home from './Home';
+import Test from './test';
 import UpdatePrice from './UpdatePrice';
 import Restock from './Restock';
 import Reports from './Reports';
@@ -29,7 +30,8 @@ function App() {
           <Route path='/Customer' element={<Customer/>} />
           <Route path='/CreateOrder' element={<CreateOrder/>} />
           <Route path='/Checkout' element={<Checkout/>} />
-          <Route path='/Customize' element={<Customize/>} />
+          <Route path='/Customize/:smoothieName' element={<Customize/>} />
+          <Route path='/Test' element={<Test/>} />
           <Route path='/MenuBoard/GetFit' element={<MenuBoard/>} />
           <Route path='/MenuBoard/BeWell' element={<MenuBoard/>} />
           <Route path='/MenuBoard/KidsMenu' element={<MenuBoard/>} />
