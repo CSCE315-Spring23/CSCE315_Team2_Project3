@@ -5,7 +5,7 @@ export default function Test() {
   const [stuff, setData] = useState(null);
 
   //in this example url, smoothies-in-blend is the function called, manage_weight is the param
-  const url = 'http://localhost:3000/excessReport/2020-01-04/2020-01-05';
+  const url = 'http://localhost:3000/restock-report';
 
   useEffect(() => {
     axios.get(url).then((response) => {

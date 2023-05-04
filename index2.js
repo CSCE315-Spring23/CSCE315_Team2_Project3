@@ -106,65 +106,6 @@ app.get('/smoothie-list', (req, res) => {
     });
 });
 
-app.get('/excessReport/:start/:end', (req, res) => {
-  const start = req.params.start;
-  const end = req.params.end;
-
-  let excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
-  const ingredientsPromise = pool.query('SELECT * FROM ingredients');
-  const smoothiesPromise = pool.query('SELECT * FROM smoothies');
-
-  Promise.all([ingredientsPromise, smoothiesPromise])
-    .then(([ingredientsResult, smoothiesResult]) => {
-      const ingredients = ingredientsResult.rows.map(row => row.name);
-      const smoothies = smoothiesResult.rows.map(row => row.name);
-
-      //set default counts
-      const dictionary = {};
-      for (const key of ingredients) {
-        dictionary[key] = 0;
-      }
-
-      // for every smoothie, get count from orders and check if under 10
-      const smoothiePromises = smoothies.map(smoothie => {
-        const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothie}')`;
-        const itemsToCountPromise = pool.query(`SELECT * FROM smoothie_ingredients WHERE smoothie='${smoothie}'`);
-
-        return Promise.all([itemsToCountPromise, pool.query(sqlStatement)])
-          .then(([itemsResult, quantityResult]) => {
-            const itemsToCount = itemsResult.rows.map(row => row.ingredient_name);
-            const quantitySold = quantityResult.rows[0].count;
-
-            for (const item of itemsToCount) {
-              dictionary[item] += quantitySold;
-            }
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      });
-
-      Promise.all(smoothiePromises)
-        .then(() => {
-          for (const key in dictionary) {
-            const value = dictionary[key];
-            if (value < 10) {
-              excess += `\t${key}\tsold: ${value}\n`;
-            }
-          }
-          res.status(200).json(excess);
-        })
-        .catch(error => {
-          console.error(error);
-          res.status(500).json({ error: 'Internal server error' });
-        });
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
 app.get('/get-all-ingredients', (req, res) => {
   console.log(pool);
   pool
@@ -395,10 +336,16 @@ app.get('/inventory', (req, res) => {
     });
 });
 
+app.get('/salesReport/:start/:end/:smoothie', async (req, res) => {
+  const { start, end, smoothie } = req.params;
+  const sales = await salesReport(start, end, smoothie);
+  res.status(200).json(sales);
+});
 
 app.get('/restock-report', (req, res) => {
   pool.query(`SELECT * FROM inventory WHERE quantity < ${max_invent_quant}`)
     .then(rs => {
+      console.log(rs)
       const restockList = [];
       restockList.push(`Fill level for each item is below ${max_invent_quant}. Please restock the following items:`);
       let count = 1;
@@ -415,18 +362,18 @@ app.get('/restock-report', (req, res) => {
       if (count === 1) {
         restockList.push('No items need to be restocked.');
       }
+      res.status(200).json(restockList);
+      // const updatePromises = rs.rows.map((item) => {
+      //   const updateQuery = `UPDATE inventory SET quantity = ${max_invent_quant} WHERE ingredient = '${item.ingredient}'`;
+      //   return pool.query(updateQuery);
+      // });
 
-      const updatePromises = rs.rows.map((item) => {
-        const updateQuery = `UPDATE inventory SET quantity = ${max_invent_quant} WHERE ingredient = '${item.ingredient}'`;
-        return pool.query(updateQuery);
-      });
-
-      return Promise.all(updatePromises)
-        .then(() => res.status(200).json(restockList))
-        .catch((err) => {
-          console.error(err);
-          res.status(500).send('An error occurred while updating the inventory.');
-        });
+      // return Promise.all(updatePromises)
+      //   .then(() => res.status(200).json(restockList))
+      //   .catch((err) => {
+      //     console.error(err);
+      //     res.status(500).send('An error occurred while updating the inventory.');
+      //   });
     })
     .catch(err => {
       console.error(err);
@@ -483,6 +430,7 @@ app.get('/excessReport/:start/:end', async(req, res) => {
   const { start, end } = req.params;
 
   const excess = `List of ingredients that sold less than 10% inventory between ${start} and ${end}:\n\n`;
+  console.log(excess);
   try {
     const ingredients = await getIngredientList();
     const smoothies = await getSmoothieList();
@@ -559,7 +507,7 @@ let conn = null;
 let stmt;
 let ZReport = "";
 let prevDate = "";
-let max_invent_quant = 200;
+let max_invent_quant = 100;
 //1 -> DONE
 //helper to add item to order
 
@@ -822,10 +770,11 @@ async function salesReport(start, end, smoothieName) {
 
   try {
     const sqlStatement = `SELECT COUNT(*) FROM smoothie_order WHERE (date BETWEEN '${start}' AND '${end}') AND (smoothie_array='${smoothieName}')`; // make query
+    console.log(sqlStatement);
     const result = await pool.query(sqlStatement); // run query
-
-    if (result && result.length > 0) {
-      order_info = `Number of orders between ${start} and ${end} for ${smoothieName}: ${result[0][0]['COUNT(*)']}`;
+    console.log(result.rows[0]['count']);
+    if (result && result.rows.length > 0) {
+      order_info = `Number of orders between ${start} and ${end} for ${smoothieName}: ${result.rows[0]['count']}`;
     } else {
       order_info = `No orders found between ${start} and ${end} for ${smoothieName}`;
     }
