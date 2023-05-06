@@ -68,6 +68,7 @@ export default function CreateOrder() {
 
   const getTab = (newSelectedButton) => {
     setSelectedTab(newSelectedButton);
+    console.log("selected Tab: ", selectedTab)
   };
   const newSmoothie = (newSelectedButton) => {
     setSmoothie(newSelectedButton);

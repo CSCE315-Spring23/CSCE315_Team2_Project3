@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios'; 
 import "./styles/reports.css";
@@ -7,8 +7,6 @@ import "./styles/reports.css";
 export default function Reports() {
 
   const navigate = useNavigate();
-  const [start, setStart] = useState('');
-  const [end, setEnd] = useState('');
   const [report, setReport] = useState('');
 
   const navigateToManager = () => {

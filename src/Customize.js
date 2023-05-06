@@ -3,8 +3,6 @@ import {useNavigate} from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import TabbedPane from './TabbedPane';
 import Header from './Header';
-//import arrays from another file
-import { smoothieName } from './temp_helper.js';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 

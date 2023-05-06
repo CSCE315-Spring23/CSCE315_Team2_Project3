@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios'; 
 
@@ -13,10 +13,10 @@ export default function Restock() {
   };
 
   const restock = () => {
-    // axios.get(`http://localhost:3000/restock-all`).then((response) => {
-    //   setReport(response.data);
-    //   console.log(response.data);
-    // });
+    axios.get(`http://localhost:3000/restock-all`).then((response) => {
+      setReport(response.data);
+      console.log(response.data);
+    });
   }
 
   return (

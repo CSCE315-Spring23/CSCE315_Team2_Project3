@@ -8,8 +8,10 @@ export default function DetailsPane(props) {
   const [editing, setEditing] = useState(false);
 
   const handleEdit = () => {
-    setEditing(true);
+    //setEditing(true);
   }
+
+  console.log(handleEdit);
 
   const handleSave = () => {
     setEditing(false);
