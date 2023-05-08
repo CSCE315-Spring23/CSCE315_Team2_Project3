@@ -22,6 +22,11 @@ app.use(cors({
   optionSuccessStatus:200
 }));
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+
 // Add process hook to shutdown pool
 process.on('SIGINT', function() {
   pool.end();
